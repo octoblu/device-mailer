@@ -1,4 +1,5 @@
 {
+  "type": "device:mailer",
   "meshblu": {
     "forwarders": {
       "received": [
@@ -12,23 +13,18 @@
     }
   },
   "messageSchema": {
-    "id": "http://jsonschema.net",
     "type": "object",
     "properties": {
       "from": {
-        "id": "http://jsonschema.net/from",
         "type": "string"
       },
       "to": {
-        "id": "http://jsonschema.net/to",
         "type": "string"
       },
       "subject": {
-        "id": "http://jsonschema.net/subject",
         "type": "string"
       },
       "text": {
-        "id": "http://jsonschema.net/text",
         "type": "string"
       }
     },
@@ -40,35 +36,27 @@
     ]
   },
   "optionsSchema": {
-    "id": "http://jsonschema.net",
     "type": "object",
     "properties": {
       "service": {
-        "id": "http://jsonschema.net/service",
         "type": "string"
       },
       "host": {
-        "id": "http://jsonschema.net/host",
         "type": "string"
       },
       "port": {
-        "id": "http://jsonschema.net/port",
         "type": "integer"
       },
       "secure": {
-        "id": "http://jsonschema.net/secure",
         "type": "boolean"
       },
       "auth": {
-        "id": "http://jsonschema.net/auth",
         "type": "object",
         "properties": {
           "user": {
-            "id": "http://jsonschema.net/auth/user",
             "type": "string"
           },
           "pass": {
-            "id": "http://jsonschema.net/auth/pass",
             "type": "string"
           }
         }

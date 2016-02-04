@@ -10,6 +10,6 @@ class MailerService
       transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
 
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
-      meshblu.message devices: ['*'], result: {err,info}, {}, callback
+      meshblu.message {devices: ['*'], result: {error: err?.message,info}}, {}, callback
 
 module.exports = MailerService

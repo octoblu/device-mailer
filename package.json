@@ -1,6 +1,6 @@
 {
   "name": "mailer-service",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Service for sending email using arbitrary mailers",
   "main": "command.js",
   "scripts": {
