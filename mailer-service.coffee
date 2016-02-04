@@ -7,7 +7,7 @@ class MailerService
     meshblu = new MeshbluHttp auth
     {transportOptions, transporter} = config
     if transporter
-      transportOptions = require("nodemailer-#{data.transporter}-transport")(transportOptions)
+      transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
 
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
       meshblu.message devices: ['*'], result: {err,info}, {}, callback
