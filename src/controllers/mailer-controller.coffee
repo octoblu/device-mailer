@@ -1,4 +1,4 @@
-MailerService = require './mailer-service'
+MailerService = require '../services/mailer-service'
 
 class MailerController
 

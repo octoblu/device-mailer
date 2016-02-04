@@ -1,4 +1,4 @@
-MailerController = require './mailer-controller'
+MailerController = require './src/controllers/mailer-controller'
 
 class Router
   route: (app) =>
