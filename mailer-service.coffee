@@ -3,9 +3,9 @@ MeshbluHttp = require 'meshblu-http'
 
 
 class MailerService
-  @processMessage: ({auth, config, message}, callback) ->
+  @processMessage: ({auth, options, message}, callback) ->
     meshblu = new MeshbluHttp auth
-    {transportOptions, transporter} = config
+    {transportOptions, transporter} = options
     if transporter
       transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
 

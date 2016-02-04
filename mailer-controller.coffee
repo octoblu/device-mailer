@@ -3,12 +3,12 @@ MailerService = require './mailer-service'
 class MailerController
 
   message: (req, res) =>
-    options =
+    config =
       auth: req.meshbluAuth
-      config: req.meshbluAuth.device.config
+      options: req.meshbluAuth.device.options
       message: req.body
 
-    MailerService.processMessage options, (error) =>
+    MailerService.processMessage config, (error) =>
       return res.sendStatus(error.code || 500) if error?
       res.sendStatus 200
 
