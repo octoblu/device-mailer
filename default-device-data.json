@@ -1,5 +1,7 @@
 {
+  "online": true,
   "type": "device:mailer",
+  "logo": "https://raw.githubusercontent.com/nodemailer/nodemailer/master/assets/nm_logo_1000x680.png",
   "meshblu": {
     "forwarders": {
       "received": [
@@ -23,59 +25,28 @@
   "messageSchema": {
     "type": "object",
     "properties": {
-      "from": {
-        "type": "string"
-      },
-      "to": {
-        "type": "string"
-      },
-      "subject": {
-        "type": "string"
-      },
-      "text": {
-        "type": "string"
-      }
+      "from"   : { "type": "string" },
+      "to"     : { "type": "string" },
+      "subject": { "type": "string" },
+      "text"   : { "type": "string" }
     },
-    "required": [
-      "from",
-      "to",
-      "subject",
-      "text"
-    ]
+    "required": [ "from", "to", "subject", "text" ]
   },
   "optionsSchema": {
     "type": "object",
     "properties": {
-      "service": {
-        "type": "string"
-      },
-      "host": {
-        "type": "string"
-      },
-      "port": {
-        "type": "integer"
-      },
-      "secure": {
-        "type": "boolean"
-      },
+      "service": { "type": "string" },
+      "host"   : { "type": "string" },
+      "port"   : { "type": "integer" },
+      "secure" : { "type": "boolean" },
       "auth": {
         "type": "object",
         "properties": {
-          "user": {
-            "type": "string"
-          },
-          "pass": {
-            "type": "string"
-          }
+          "user": { "type": "string" },
+          "pass": { "type": "string" }
         }
       }
     },
-    "required": [
-      "service",
-      "host",
-      "port",
-      "secure",
-      "auth"
-    ]
+    "required": [ "service", "host", "port", "secure", "auth" ]
   }
 }

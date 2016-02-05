@@ -12,7 +12,7 @@ class MailerService
 
     MailerService._encryptOptions options, (error, encryptedOptions) =>
       return callback(error) if error?
-      meshblu.updateDangerously auth.uuid, $set: {encryptedOptions: encryptedOptions}, $unset: {options: true}, callback
+      meshblu.updateDangerously auth.uuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
 
   @processMessage: ({auth, encryptedOptions, message}, callback) ->
     meshblu = new MeshbluHttp auth
@@ -32,7 +32,7 @@ class MailerService
     callback null, encryptedOptions
 
   @_decryptOptions: (options, callback) =>
-    decryptedOptions = JSON.parse AESCrypt.decrypt
+    decryptedOptions = JSON.parse AESCrypt.decrypt options
     callback null, decryptedOptions
 
 module.exports = MailerService
