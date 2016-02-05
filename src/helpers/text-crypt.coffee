@@ -1,6 +1,6 @@
 crypto = require('crypto')
-cryptkey = crypto.createHash('sha256').update(process.env.TEXT_CRYPT_KEY or 'notsecure').digest()
-iv = new Buffer(process.env.TEXT_CRYPT_NONCE or 'thisisanoncense1')
+cryptkey = crypto.createHash('sha256').update(process.env.AES_KEY or 'localmailer').digest()
+iv = new Buffer(process.env.AES_IV or 'NOTANONCEPETER!!')
 AESCrypt = {}
 
 AESCrypt.decrypt = (encryptdata) ->
