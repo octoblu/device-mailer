@@ -28,6 +28,7 @@ class MailerService
         meshblu.message {devices: ['*'], result: {error: err?.message,info}}, {}, callback
 
   @_encryptOptions: (options, callback) =>
+    console.log 'options:', options
     encryptedOptions = AESCrypt.encrypt JSON.stringify options
     callback null, encryptedOptions
 

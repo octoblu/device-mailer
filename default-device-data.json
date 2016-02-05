@@ -28,9 +28,15 @@
       "from"   : { "type": "string" },
       "to"     : { "type": "string" },
       "subject": { "type": "string" },
-      "text"   : { "type": "string" }
-    },
-    "required": [ "from", "to", "subject", "text" ]
+      "text"   : {
+        "type": "string",
+        "x-schema-form": { "type": "textarea" }
+      },
+      "html"   : {
+        "type": "string",
+        "x-schema-form": { "type": "textarea" }
+      }
+    }
   },
   "optionsSchema": {
     "type": "object",
@@ -38,7 +44,7 @@
       "service": { "type": "string" },
       "host"   : { "type": "string" },
       "port"   : { "type": "integer" },
-      "secure" : { "type": "boolean" },
+      "secure" : { "type": ["null","boolean"], "default": null },
       "auth": {
         "type": "object",
         "properties": {
@@ -46,7 +52,6 @@
           "pass": { "type": "string" }
         }
       }
-    },
-    "required": [ "service", "host", "port", "secure", "auth" ]
+    }
   }
 }
