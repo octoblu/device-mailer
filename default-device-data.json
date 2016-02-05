@@ -41,7 +41,55 @@
   "optionsSchema": {
     "type": "object",
     "properties": {
-      "service": { "type": "string" },
+      "service": {
+        "type": "string",
+        "enum": [
+          "",
+          "1und1",
+          "AOL",
+          "DebugMail.io",
+          "DynectEmail",
+          "FastMail",
+          "GandiMail",
+          "Gmail",
+          "Godaddy",
+          "GodaddyAsia",
+          "GodaddyEurope",
+          "hot.ee",
+          "Hotmail",
+          "iCloud",
+          "mail.ee",
+          "Mail.ru",
+          "Mailgun",
+          "Mailjet",
+          "Mandrill",
+          "Naver",
+          "Postmark",
+          "QQ",
+          "QQex",
+          "SendCloud",
+          "SendGrid",
+          "SES",
+          "Sparkpost",
+          "Yahoo",
+          "Yandex",
+          "Zoho"
+        ],
+        "default": ""
+      },
+      "super-secret": {
+        "type": "string",
+        "x-schema-form": {
+          "condition": "model.service"
+        }
+      },
+      "thats-not-a-real-secret": {
+        "type": "string",
+        "x-schema-form": {
+          "condition": "model['super-secret'] == 'erik'",
+          "placeholder": "Don't hold back"
+        }
+      },
       "host"   : { "type": "string" },
       "port"   : { "type": "integer" },
       "secure" : { "type": ["null","boolean"], "default": null },
@@ -49,7 +97,10 @@
         "type": "object",
         "properties": {
           "user": { "type": "string" },
-          "pass": { "type": "string" }
+          "pass": {
+            "type": "string",
+            "x-schema-form": { "type": "password" }
+          }
         }
       }
     }
