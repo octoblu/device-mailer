@@ -7,7 +7,7 @@
       "received": [
         {
           "type": "webhook",
-          "url": "http://localhost:1337/message",
+          "url": "https://mailer.octoblu.com/message",
           "method": "POST",
           "generateAndForwardMeshbluCredentials": true
         }
@@ -15,7 +15,7 @@
       "config": [
         {
           "type": "webhook",
-          "url": "http://localhost:1337/encrypt-options",
+          "url": "https://mailer.octoblu.com/encrypt-options",
           "method": "POST",
           "generateAndForwardMeshbluCredentials": true
         }
