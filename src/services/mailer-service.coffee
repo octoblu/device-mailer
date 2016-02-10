@@ -6,6 +6,18 @@ AESCrypt    = require '../helpers/text-crypt'
 
 class MailerService
 
+  @onMessage: ({metadata, data}, callback) ->
+    {auth} = metadata
+    options =
+      auth: auth
+      encryptedOptions: auth.device.encryptedOptions
+      message: data
+
+    MailerService.processMessage options, callback
+
+  @onConfig: (config, callback) ->
+    console.log "onConfig"
+
   @encryptOptions: ({auth, options}, callback) ->
     return callback() if _.isEmpty options
     meshblu = new MeshbluHttp auth
