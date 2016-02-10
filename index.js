@@ -1,3 +1,3 @@
 require('coffee-script/register')
 
-module.exports = require('./src/services/mailer-service')
+module.exports = require('./src/device/device-mailer')

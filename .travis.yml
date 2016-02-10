@@ -1,6 +1,5 @@
 language: node_js
 node_js:
 - '5'
-deploy:
-  api_key:
-    secure: cYQQNNmvhF/X/84YWkLEL2c1j3AbSGvg2aC1yse3luRW+1O5ElAUb0Bo9XRB4jHCdJj+WGNh3KjbCeCdO5Vq+qVZeUVKil7rJpqr6DLhcziN8VDcAjTrHQBUKZcPxMu+YU3F1juCI8xNnQuIcm2YBtlYmxd0D3XYCi/gDNsRuMsz/wBkOdGNbqPB9yhIV3Yg2LwjL22UWqD/CJiY73AB2HpSggUC+DyWfp1jTM7H1RdCFLgyZtdr+ieZdSasD/hZaKdKIMY1Uhtfo+/yeGkurDdnrv4BiE8+/OlVKGc2w8Zh3O4MM08SLN4ymZeGk+HfBxy8reb4QOUh09WjBvr4tIOfVaul68UOQaJjDxi/rtcf/kxbRO01VuwzoDJcirxmr6O8n5H0kRadMlj8pX5aKiaKxKm+7rIOqWxNrjQsOXdkvzzjeQkfG2O9pIcRk4ZyG9T8klcfjscu6WcD82ayPRT+IrqlOhoXOEfNLkswR/hf8FUDWBvIsV7KzvVkFhjEkJVpPbzTFLyAcLKe9K1guVoAEw+CGM/HqwyeReP/5ER+0zyZNiazIlHhsnQjcSpNUbkFuPwJhLOZjxP+qwSO9E0Ldkat0yKgwtssHEgGet/+za1SX47/PlT/2uj/sd4AMcxepLlIW9W9cz2SM2F1pg3bT6GFCsAyF114GCn0O3k=
+on:
+  tags: true

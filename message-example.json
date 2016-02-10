@@ -1,0 +1,10 @@
+{
+  "devices": ["852b4fe7-7a47-4f7f-aa77-1298115ff13a"],
+  "metadata": {},
+  "message": {
+    "from": "sqrtofsaturn@gmail.com",
+    "to": "sqrtofsaturn@gmail.com",
+    "subject": "Hello From the beautiful, beautiful mailer device yaay",
+    "text": "This works. omg."
+  }
+}
