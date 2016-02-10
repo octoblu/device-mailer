@@ -1,6 +1,6 @@
 {
   "name": "device-mailer",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Service for sending email using arbitrary mailers",
   "main": "index.js",
   "scripts": {
