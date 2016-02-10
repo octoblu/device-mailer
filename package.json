@@ -25,7 +25,7 @@
     "dashdash": "^1.12.2",
     "meshblu-config": "^3.1.1",
     "nodemailer": "^2.1.0",
-    "channel-device-protocol-adapter-http": "^1.0.0",
+    "device-protocol-adapter-http": "^1.0.0",
     "nodemailer-mandrill-transport": "^1.0.0",
     "nodemailer-sailthru-transport": "^0.2.2",
     "nodemailer-sendgrid-transport": "^0.2.0",
