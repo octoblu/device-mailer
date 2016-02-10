@@ -1,48 +1,61 @@
 {
-  "online": true,
-  "type": "device:mailer",
   "logo": "https://raw.githubusercontent.com/nodemailer/nodemailer/master/assets/nm_logo_1000x680.png",
   "meshblu": {
     "forwarders": {
-      "received": [
-        {
-          "type": "webhook",
-          "url": "https://mailer.octoblu.com/message",
-          "method": "POST",
-          "generateAndForwardMeshbluCredentials": true
-        }
-      ],
       "config": [
         {
-          "type": "webhook",
-          "url": "https://mailer.octoblu.com/config",
+          "generateAndForwardMeshbluCredentials": true,
           "method": "POST",
-          "generateAndForwardMeshbluCredentials": true
+          "type": "webhook",
+          "url": "https://mailer.octoblu.com/config"
+        }
+      ],
+      "received": [
+        {
+          "generateAndForwardMeshbluCredentials": true,
+          "method": "POST",
+          "type": "webhook",
+          "url": "https://mailer.octoblu.com/message"
         }
       ]
     }
   },
   "messageSchema": {
-    "type": "object",
     "properties": {
-      "from"   : { "type": "string" },
-      "to"     : { "type": "string" },
-      "subject": { "type": "string" },
-      "text"   : {
-        "type": "string",
-        "x-schema-form": { "type": "textarea" }
-      },
-      "html"   : {
-        "type": "string",
-        "x-schema-form": { "type": "textarea" }
+      "message": {
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string",
+            "x-schema-form": {
+              "type": "textarea"
+            }
+          },
+          "text": {
+            "type": "string",
+            "x-schema-form": {
+              "type": "textarea"
+            }
+          }
+        },
+        "type": "object"
       }
-    }
+    },
+    "type": "object"
   },
+  "online": true,
   "optionsSchema": {
-    "type": "object",
     "properties": {
       "service": {
-        "type": "string",
+        "default": "",
         "enum": [
           "",
           "1und1",
@@ -75,24 +88,21 @@
           "Yandex",
           "Zoho"
         ],
-        "default": ""
+        "type": "string"
       },
-      "super-secret": {
-        "type": "string",
-        "x-schema-form": {
-          "condition": "model.service"
-        }
+      "host": {
+        "type": "string"
       },
-      "thats-not-a-real-secret": {
-        "type": "string",
-        "x-schema-form": {
-          "condition": "model['super-secret'] == 'erik'",
-          "placeholder": "Don't hold back"
-        }
+      "port": {
+        "type": "integer"
       },
-      "host"   : { "type": "string" },
-      "port"   : { "type": "integer" },
-      "secure" : { "type": ["null","boolean"], "default": null },
+      "secure": {
+        "default": null,
+        "type": [
+          "null",
+          "boolean"
+        ]
+      },
       "auth": {
         "type": "object",
         "properties": {
@@ -103,6 +113,8 @@
           }
         }
       }
-    }
-  }
+    },
+    "type": "object"
+  },
+  "type": "device:mailer"
 }
