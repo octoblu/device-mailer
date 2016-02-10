@@ -6,17 +6,23 @@ AESCrypt    = require '../helpers/text-crypt'
 
 class MailerService
 
-  @onMessage: ({metadata, data}, callback) ->
+  @onMessage: ({metadata, message, config}, callback) ->
     {auth} = metadata
     options =
       auth: auth
-      encryptedOptions: auth.device.encryptedOptions
-      message: data
+      encryptedOptions: config.encryptedOptions
+      message: message
 
     MailerService.processMessage options, callback
 
-  @onConfig: (config, callback) ->
-    console.log "onConfig"
+  @onConfig: ({metadata, config}, callback) ->
+    {auth} = metadata
+    options =
+      auth: auth
+      options: config.options
+
+    MailerService.encryptOptions options, callback
+
 
   @encryptOptions: ({auth, options}, callback) ->
     return callback() if _.isEmpty options
@@ -40,7 +46,6 @@ class MailerService
         meshblu.message {devices: ['*'], result: {error: err?.message,info}}, {}, callback
 
   @_encryptOptions: (options, callback) =>
-    console.log 'options:', options
     encryptedOptions = AESCrypt.encrypt JSON.stringify options
     callback null, encryptedOptions
 
