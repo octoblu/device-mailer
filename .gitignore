@@ -37,3 +37,4 @@ node_modules
 .node_repl_history
 local-mailer.json
 prod-mailer.json
+meshblu*.json
