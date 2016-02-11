@@ -6,9 +6,10 @@ AESCrypt    = require '../helpers/text-crypt'
 
 class MailerService
 
-  @onMessage: ({metadata, message, config}, callback) ->
+  @onReceived: ({metadata, message, config}, callback) ->
     {auth} = metadata
     options =
+      userDeviceUuid: config.uuid
       auth: auth
       encryptedOptions: config.encryptedOptions
       message: message
@@ -18,19 +19,20 @@ class MailerService
   @onConfig: ({metadata, config}, callback) ->
     {auth} = metadata
     options =
+      userDeviceUuid: config.uuid
       auth: auth
       options: config.options
 
     MailerService.encryptOptions options, callback
 
 
-  @encryptOptions: ({auth, options}, callback) ->
+  @encryptOptions: ({userDeviceUuid, auth, options}, callback) ->
     return callback() if _.isEmpty options
     meshblu = new MeshbluHttp auth
 
     MailerService._encryptOptions options, (error, encryptedOptions) =>
       return callback(error) if error?
-      meshblu.updateDangerously auth.uuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
+      meshblu.updateDangerously userDeviceUuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
 
   @processMessage: ({auth, encryptedOptions, message}, callback) ->
     meshblu = new MeshbluHttp auth

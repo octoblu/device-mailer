@@ -1,56 +1,6 @@
 {
+  "type": "device:mailer",
   "logo": "https://raw.githubusercontent.com/nodemailer/nodemailer/master/assets/nm_logo_1000x680.png",
-  "meshblu": {
-    "forwarders": {
-      "config": [
-        {
-          "generateAndForwardMeshbluCredentials": true,
-          "method": "POST",
-          "type": "webhook",
-          "url": "https://mailer.octoblu.com/config"
-        }
-      ],
-      "received": [
-        {
-          "generateAndForwardMeshbluCredentials": true,
-          "method": "POST",
-          "type": "webhook",
-          "url": "https://mailer.octoblu.com/message"
-        }
-      ]
-    }
-  },
-  "messageSchema": {
-    "properties": {
-      "message": {
-        "properties": {
-          "from": {
-            "type": "string"
-          },
-          "to": {
-            "type": "string"
-          },
-          "subject": {
-            "type": "string"
-          },
-          "html": {
-            "type": "string",
-            "x-schema-form": {
-              "type": "textarea"
-            }
-          },
-          "text": {
-            "type": "string",
-            "x-schema-form": {
-              "type": "textarea"
-            }
-          }
-        },
-        "type": "object"
-      }
-    },
-    "type": "object"
-  },
   "online": true,
   "optionsSchema": {
     "properties": {
@@ -116,5 +66,35 @@
     },
     "type": "object"
   },
-  "type": "device:mailer"
+  "messageSchema": {
+    "properties": {
+      "message": {
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string",
+            "x-schema-form": {
+              "type": "textarea"
+            }
+          },
+          "text": {
+            "type": "string",
+            "x-schema-form": {
+              "type": "textarea"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "object"
+  }
 }

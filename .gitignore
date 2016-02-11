@@ -38,3 +38,4 @@ node_modules
 local-mailer.json
 prod-mailer.json
 meshblu*.json
+tmp/
