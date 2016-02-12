@@ -37,7 +37,7 @@ class MailerService
   @processMessage: ({userDeviceUuid, auth, encryptedOptions, message}, callback) ->
     meshblu = new MeshbluHttp auth
     unless encryptedOptions?
-      meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, as: userDeviceUuid, callback
+      return meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, as: userDeviceUuid, callback
 
     MailerService._decryptOptions encryptedOptions, (error, options) =>
       {transportOptions, transporter} = options
