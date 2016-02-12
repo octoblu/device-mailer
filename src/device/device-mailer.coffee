@@ -34,10 +34,10 @@ class MailerService
       return callback(error) if error?
       meshblu.updateDangerously userDeviceUuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
 
-  @processMessage: ({auth, encryptedOptions, message}, callback) ->
+  @processMessage: ({userDeviceUuid, auth, encryptedOptions, message}, callback) ->
     meshblu = new MeshbluHttp auth
     unless encryptedOptions?
-      meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, {}, callback
+      meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, as: userDeviceUuid, callback
 
     MailerService._decryptOptions encryptedOptions, (error, options) =>
       {transportOptions, transporter} = options
@@ -45,7 +45,7 @@ class MailerService
         transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
 
       nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
-        meshblu.message {devices: ['*'], result: {error: err?.message,info}}, {}, callback
+        meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: userDeviceUuid, callback
 
   @_encryptOptions: (options, callback) =>
     encryptedOptions = AESCrypt.encrypt JSON.stringify options
