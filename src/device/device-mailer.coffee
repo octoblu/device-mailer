@@ -4,7 +4,16 @@ MeshbluHttp = require 'meshblu-http'
 
 AESCrypt    = require '../helpers/text-crypt'
 
+defaultUserDevice = require '../../data/device-user-config.json'
+CredentialManager = require '../models/credential-manager'
+
 class MailerService
+  
+  @onCreate: ({metadata, data}, callback) ->
+    {auth} = metadata
+    {owner} = data
+
+    MailerService.createDevice {auth, owner}, callback
 
   @onReceived: ({metadata, message, config}, callback) ->
     {auth} = metadata
@@ -25,6 +34,17 @@ class MailerService
 
     MailerService.encryptOptions options, callback
 
+  @createDevice: ({auth, owner}, callback) ->
+    deviceData = MailerService.getUserDeviceData({auth, owner})
+
+    meshblu = new MeshbluHttp auth
+    meshblu.register deviceData, callback
+
+  @getUserDeviceData({auth, owner}) =>
+    deviceData = _.cloneDeep defaultUserDevice
+    deviceData.owner = owner
+
+    return deviceData
 
   @encryptOptions: ({userDeviceUuid, auth, options}, callback) ->
     return callback() if _.isEmpty options

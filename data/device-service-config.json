@@ -1,0 +1,41 @@
+{
+  "online": true,
+  "discoverWhitelist": [
+    "*"
+  ],
+  "configureWhitelist": [
+    "*"
+  ],
+  "receiveWhitelist": [
+    "*"
+  ],
+  "sendWhitelist": [
+    "*"
+  ],
+  "meshblu": {
+    "forwarders": {
+      "received": [
+        {
+          "type": "webhook",
+          "url": "http://localhost:1337/message",
+          "method": "POST",
+          "generateAndForwardMeshbluCredentials": true
+        },
+        {
+          "type": "webhook",
+          "url": "http://localhost:1337/received",
+          "method": "POST",
+          "generateAndForwardMeshbluCredentials": true
+        }
+      ],
+      "config": [
+        {
+          "type": "webhook",
+          "url": "http://localhost:1337/config",
+          "method": "POST",
+          "generateAndForwardMeshbluCredentials": true
+        }
+      ]
+    }
+  }
+}
