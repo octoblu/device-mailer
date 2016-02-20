@@ -8,7 +8,7 @@ defaultUserDevice = require '../../data/device-user-config.json'
 CredentialManager = require '../models/credential-manager'
 
 class MailerService
-  
+
   @onCreate: ({metadata, data}, callback) ->
     {auth} = metadata
     {owner} = data
@@ -40,7 +40,7 @@ class MailerService
     meshblu = new MeshbluHttp auth
     meshblu.register deviceData, callback
 
-  @getUserDeviceData({auth, owner}) =>
+  @getUserDeviceData: ({auth, owner}) =>
     deviceData = _.cloneDeep defaultUserDevice
     deviceData.owner = owner
 
