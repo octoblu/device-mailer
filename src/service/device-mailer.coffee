@@ -92,11 +92,15 @@ class MailerService
       meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: userDeviceUuid, callback
 
   _encryptOptions: (options, callback) =>
-    encryptedOptions = @key.encryptPrivate JSON.stringify options
+    encryptedOptions = @key.encrypt(JSON.stringify options).toString 'base64'
     callback null, encryptedOptions
 
   _decryptOptions: (options, callback) =>
-    decryptedOptions = JSON.parse @key.decrypt options
+    try
+      decryptedOptions = JSON.parse @key.decrypt(options)
+    catch error
+      return callback error
+
     callback null, decryptedOptions
 
 module.exports = MailerService

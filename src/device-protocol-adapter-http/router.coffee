@@ -36,7 +36,7 @@ class Router
       authorizationURL: 'http://oauth.octoblu.dev/authorize'
       tokenURL: 'http://oauth.octoblu.dev/access_token'
       clientSecret: clientSecret
-      callbackURL: 'http://localhost:1337/octoblu/authenticate'
+      callbackURL: 'http://device-mailer.octoblu.dev/octoblu/authenticate'
       passReqToCallback: true
 
     passport.use new OctobluStrategy octobluStrategyConfig, (req, bearerToken, secret, {uuid}, next) =>
