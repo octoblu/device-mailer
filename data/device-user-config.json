@@ -56,10 +56,14 @@
       "auth": {
         "type": "object",
         "properties": {
-          "user": { "type": "string" },
+          "user": {
+            "type": "string"
+          },
           "pass": {
             "type": "string",
-            "x-schema-form": { "type": "password" }
+            "x-schema-form": {
+              "type": "password"
+            }
           }
         }
       }
@@ -96,5 +100,15 @@
       }
     },
     "type": "object"
+  },
+  "meshblu": {
+    "config": [
+      {
+        "type": "webhook",
+        "url": "http://device-mailer.octoblu.dev/device/verify-configuration",
+        "method": "POST",
+        "generateAndForwardMeshbluCredentials": true
+      }
+    ]
   }
 }

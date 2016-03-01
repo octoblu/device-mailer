@@ -15,6 +15,10 @@ class MailerService
 
     MailerService.createDevice {auth, owner}, callback
 
+  @onVerifyConfiguration: ({metadata, config}, callback) ->
+    return MailerService.onConfig({metadata, config}, callback) if config.options?
+    MailerService.onReceived {metadata, config, message: 'click on some link in this email, bruh'}, callback
+
   @onReceived: ({metadata, message, config}, callback) ->
     {auth} = metadata
     options =

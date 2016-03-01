@@ -17,13 +17,13 @@
       "received": [
         {
           "type": "webhook",
-          "url": "http://localhost:1337/message",
+          "url": "http://device-mailer.octoblu.dev/message",
           "method": "POST",
           "generateAndForwardMeshbluCredentials": true
         },
         {
           "type": "webhook",
-          "url": "http://localhost:1337/received",
+          "url": "http://device-mailer.octoblu.dev/received",
           "method": "POST",
           "generateAndForwardMeshbluCredentials": true
         }
@@ -31,7 +31,7 @@
       "config": [
         {
           "type": "webhook",
-          "url": "http://localhost:1337/config",
+          "url": "http://device-mailer.octoblu.dev/config",
           "method": "POST",
           "generateAndForwardMeshbluCredentials": true
         }
