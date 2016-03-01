@@ -7,7 +7,6 @@ class CredentialsController
   constructor: ({@service}) ->
 
   authenticate: (req, res) =>
-    console.log {user: req.user, cookie: req.cookies}
     res.cookie('meshblu_auth_bearer', req.user.bearerToken)
     res.redirect '/device/authorize'
 
@@ -33,5 +32,10 @@ class CredentialsController
 
   authorized: (req, res) =>
     throw new Error('Implement authorized plz')
+
+  verify: (req, res) =>
+    res.send @service.linkToCredentialsDevice req.query.code, (error) =>
+      res.send(error.code || 500).send(error.message) if error?
+      res.sendStatus 200
 
 module.exports = CredentialsController

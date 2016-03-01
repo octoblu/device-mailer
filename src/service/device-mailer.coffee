@@ -15,21 +15,29 @@ class MailerService
     keyBinary = new Buffer(keyString, 'base64')
     return new NodeRSA keyBinary, 'pkcs1-der'
 
-  onCreate: ({metadata, data}, callback) ->
+  onCreate: ({metadata, data}, callback) =>
     {auth} = metadata
     {owner} = data
 
     @createDevice {auth, owner}, callback
 
-  onConfig: ({metadata, config}, callback) ->
-    return @_encryptAndUpdate({metadata, config}, callback) if config.options?
-    return callback new Error("No encrypted options: can't send verification email") unless config.encryptedOptions?
+  onConfig: ({metadata, config}, callback) =>
+    {options, encryptedOptions} = config
+    {auth} = metadata
+    return callback() unless options?
 
-    @_decryptOptions config.encryptedOptions, (error, options) =>
-      message = @getVerificationMessage options
-      @onReceived {metadata, config, message}, callback
+    @_encryptAndUpdate {auth, options}, (error) =>
+      @getVerificationMessage {auth, options}, (error, message) =>
+        return callback error if error?
+        options =
+          userDeviceUuid: config.uuid
+          auth: auth
+          options: options
+          message: message
 
-  onReceived: ({metadata, message, config}, callback) ->
+        @processMessage options, callback
+
+  onReceived: ({metadata, message, config}, callback) =>
     {auth} = metadata
     {encryptedOptions} = config
     unless encryptedOptions?
@@ -44,16 +52,14 @@ class MailerService
 
       @processMessage options, callback
 
-  _encryptAndUpdate: ({metadata, config}, callback) ->
-    {auth} = metadata
-    options =
-      userDeviceUuid: config.uuid
-      auth: auth
-      options: config.options
+  _encryptAndUpdate: ({auth, options}, callback) =>
+    return callback() if _.isEmpty options
+    encryptedOptions = @_encryptOptions options
 
-    @encryptOptions options, callback
+    meshblu = new MeshbluHttp auth
+    meshblu.updateDangerously auth.uuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
 
-  createDevice: ({auth, owner}, callback) ->
+  createDevice: ({auth, owner}, callback) =>
     deviceData = @getUserDeviceData({auth, owner})
 
     meshblu = new MeshbluHttp auth
@@ -65,25 +71,21 @@ class MailerService
 
     return deviceData
 
-  getVerificationMessage: (options) =>
-    return {
-      to: options.auth.user
-      from: options.auth.user
-      subject: "U R verified!!"
-      text: "That's pretty much it"
-    }
-
-  encryptOptions: ({userDeviceUuid, auth, options}, callback) ->
-    return callback() if _.isEmpty options
+  getVerificationMessage: ({auth, options}, callback) =>
     meshblu = new MeshbluHttp auth
+    meshblu.generateAndStoreToken auth.uuid, (error, response) =>
+      return callback error if error?
+      code = @_authToCode uuid: auth.uuid, token: response.token
+      message =
+        to: options.auth.user
+        from: options.auth.user
+        subject: "Verify Email"
+        text: "http://device-mailer.octoblu.dev/device/verify?code=#{code}"
 
-    @_encryptOptions options, (error, encryptedOptions) =>
-      return callback(error) if error?
-      meshblu.updateDangerously userDeviceUuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
+      callback null, message
 
-  processMessage: ({userDeviceUuid, auth, options, message}, callback) ->
+  processMessage: ({userDeviceUuid, auth, options, message}, callback) =>
     meshblu = new MeshbluHttp auth
-    console.log('processing message:', {userDeviceUuid, auth, options, message})
     {transportOptions, transporter} = options
     if transporter
       transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
@@ -91,16 +93,35 @@ class MailerService
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
       meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: userDeviceUuid, callback
 
-  _encryptOptions: (options, callback) =>
-    encryptedOptions = @key.encrypt(JSON.stringify options).toString 'base64'
-    callback null, encryptedOptions
+  _authToCode: ({uuid, token}) =>
+    newAuth = "#{uuid}:#{token}"
+    verifier =
+      auth: newAuth
+      signature: @_sign newAuth
 
-  _decryptOptions: (options, callback) =>
-    try
-      decryptedOptions = JSON.parse @key.decrypt(options)
-    catch error
-      return callback error
+    return encodeURIComponent(new Buffer(JSON.stringify(verifier)).toString('base64'))
 
-    callback null, decryptedOptions
+  _codeToAuth: (code) =>
+    {auth, signature} = JSON.parse(new Buffer(code, 'base64').toString())
+    verified = @_verify auth, signature
+    [uuid, token] = auth.split ':'
+
+    return {uuid, token, verified}
+
+  _encryptOptions: (options) =>
+    @key.encrypt(JSON.stringify options).toString 'base64'
+
+  _decryptOptions: (options) =>
+    decryptedOptions = JSON.parse @key.decrypt(options)
+
+  _sign: (options) =>
+    optionsBuffer = new Buffer(options)
+    @key.sign optionsBuffer
+
+  _verify: (options, signature) =>
+    optionsBuffer = new Buffer options
+    signatureBuffer = new Buffer signature, 'base64'
+
+    @key.verify optionsBuffer, signatureBuffer
 
 module.exports = MailerService

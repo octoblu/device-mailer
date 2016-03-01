@@ -23,6 +23,8 @@ class Router
     app.use meshbluAuth
     app.get '/device/authorize', @credentialsController.authorize
 
+    app.get '/device/verify', @credentialsController.verify
+
     app.get '/device/configured', (req, res) =>
       res.send('device configured. please check your email to confirm your credentials')
 
@@ -30,6 +32,7 @@ class Router
     app.post '/events/config', @deviceController.config
 
     app.get '/', (req, res) => res.redirect '/device/authorize'
+    
   setupOctobluOauth: ({clientID, clientSecret}) =>
     octobluStrategyConfig =
       clientID: clientID
