@@ -1,0 +1,7 @@
+{
+  "uuid": "31c95c15-b533-4340-9321-84ec8c9f6efa",
+  "token": "fba33949482d0cf93cc851c3e2fd69f197014caa",
+  "server": "meshblu.octoblu.dev",
+  "port": "80",
+  "type": "device:mailer"
+}
