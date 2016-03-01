@@ -1,78 +1,9 @@
 {
+  "type": "device:mailer",
   "logo": "https://raw.githubusercontent.com/nodemailer/nodemailer/master/assets/nm_logo_1000x680.png",
-  "meshblu": {
-    "forwarders": {
-      "config": [
-        {
-          "generateAndForwardMeshbluCredentials": true,
-          "method": "POST",
-          "type": "webhook",
-          "url": "http://device-mailer.octoblu.dev/device/verify-configuration"
-        }
-      ]
-    }
-  },
-  "messageSchema": {
-    "properties": {
-      "message": {
-        "properties": {
-          "from": {
-            "type": "string"
-          },
-          "html": {
-            "type": "string",
-            "x-schema-form": {
-              "type": "textarea"
-            }
-          },
-          "subject": {
-            "type": "string"
-          },
-          "text": {
-            "type": "string",
-            "x-schema-form": {
-              "type": "textarea"
-            }
-          },
-          "to": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      }
-    },
-    "type": "object"
-  },
   "online": true,
   "optionsSchema": {
     "properties": {
-      "auth": {
-        "properties": {
-          "pass": {
-            "type": "string",
-            "x-schema-form": {
-              "type": "password"
-            }
-          },
-          "user": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "host": {
-        "type": "string"
-      },
-      "port": {
-        "type": "integer"
-      },
-      "secure": {
-        "default": null,
-        "type": [
-          "null",
-          "boolean"
-        ]
-      },
       "service": {
         "default": "",
         "enum": [
@@ -108,9 +39,78 @@
           "Zoho"
         ],
         "type": "string"
+      },
+      "host": {
+        "type": "string"
+      },
+      "port": {
+        "type": "integer"
+      },
+      "secure": {
+        "default": null,
+        "type": [
+          "null",
+          "boolean"
+        ]
+      },
+      "auth": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string"
+          },
+          "pass": {
+            "type": "string",
+            "x-schema-form": {
+              "type": "password"
+            }
+          }
+        }
       }
     },
     "type": "object"
   },
-  "type": "device:mailer"
+  "messageSchema": {
+    "properties": {
+      "message": {
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string",
+            "x-schema-form": {
+              "type": "textarea"
+            }
+          },
+          "text": {
+            "type": "string",
+            "x-schema-form": {
+              "type": "textarea"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "object"
+  },
+  "meshblu": {
+    "forwarders": {
+      "config": [
+        {
+          "type": "webhook",
+          "url": "http://device-mailer.octoblu.dev/events/config",
+          "method": "POST",
+          "generateAndForwardMeshbluCredentials": true
+        }
+      ]
+    }
+  }
 }
