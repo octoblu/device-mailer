@@ -15,8 +15,10 @@ class MailerService
 
     MailerService.createDevice {auth, owner}, callback
 
-  @onVerifyConfiguration: ({metadata, config}, callback) ->
-    return MailerService.onConfig({metadata, config}, callback) if config.options?
+  @onConfig: ({metadata, config}, callback) ->
+    return MailerService._encryptAndUpdate({metadata, config}, callback) if config.options?
+    return callback new Error("No encrypted options: can't send verification email") unless config.encryptedOptions?
+    
     MailerService.onReceived {metadata, config, message: 'click on some link in this email, bruh'}, callback
 
   @onReceived: ({metadata, message, config}, callback) ->
@@ -29,7 +31,7 @@ class MailerService
 
     MailerService.processMessage options, callback
 
-  @onConfig: ({metadata, config}, callback) ->
+  @_encryptAndUpdate: ({metadata, config}, callback) ->
     {auth} = metadata
     options =
       userDeviceUuid: config.uuid
