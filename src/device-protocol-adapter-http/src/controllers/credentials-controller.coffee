@@ -34,8 +34,8 @@ class CredentialsController
     throw new Error('Implement authorized plz')
 
   verify: (req, res) =>
-    res.send @service.linkToCredentialsDevice req.query.code, (error) =>
+    res.send @service.linkToCredentialsDevice req.query.code, (error, data) =>
       res.send(error.code || 500).send(error.message) if error?
-      res.sendStatus 200
+      res.status(200).send data
 
 module.exports = CredentialsController
