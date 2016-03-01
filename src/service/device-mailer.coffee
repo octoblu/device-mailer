@@ -13,8 +13,8 @@ class MailerService
 
   getPrivateKey: (keyString) =>
     keyBinary = new Buffer(keyString, 'base64')
-    return new NodeRSA keyBinary, 'pkcs1-private-der'
-    
+    return new NodeRSA keyBinary, 'pkcs1-der'
+
   onCreate: ({metadata, data}, callback) ->
     {auth} = metadata
     {owner} = data
