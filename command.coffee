@@ -1,8 +1,11 @@
 dashdash = require 'dashdash'
 MailerService = require '.'
+MeshbluConfig = require 'meshblu-config'
 
 ProtocolAdapter = require './src/device-protocol-adapter-http'
-adapter = new ProtocolAdapter {service: MailerService}
+service = new MailerService {meshbluConfig: new MeshbluConfig().toJSON()}
+
+adapter = new ProtocolAdapter {service}
 
 adapter.run()
 

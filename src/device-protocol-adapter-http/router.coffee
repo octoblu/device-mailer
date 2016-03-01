@@ -25,7 +25,6 @@ class Router
 
     app.get '/device/configured', (req, res) =>
       res.send('device configured. please check your email to confirm your credentials')
-    # app.get '/device/authorized', @credentialsController.authorized
 
     app.post '/events/received', @deviceController.received
     app.post '/events/config', @deviceController.config
