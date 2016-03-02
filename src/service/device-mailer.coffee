@@ -95,7 +95,8 @@ class MailerService
     return callback(@_userError 'Code could not be verified', 401) unless verified
     @_getEncryptedOptionsFromDevice {uuid, token}, (error, options) =>
       clientID = @_getClientID options
-      @credentialDeviceManager.findOrCreate {clientID, clientSecret: options}, callback
+      clientSecret = @_getClientSecret options
+      @credentialDeviceManager.updateOrCreate {clientID, clientSecret}, callback
 
 
   _getEncryptedOptionsFromDevice: ({uuid, token}, callback) =>
@@ -114,5 +115,8 @@ class MailerService
 
   _getClientID: (options) =>
     options.auth.user
+
+  _getClientSecret: (options) =>
+    options
 
 module.exports = MailerService
