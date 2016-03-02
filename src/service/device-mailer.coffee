@@ -96,11 +96,27 @@ class MailerService
     @_getEncryptedOptionsFromDevice {uuid, token}, (error, options) =>
       clientID = @_getClientID options
       clientSecret = @_getClientSecret options
-      @credentialDeviceManager.updateOrCreate {clientID, clientSecret}, callback
+      @credentialDeviceManager.updateOrCreate {clientID, clientSecret}, (error, credentialsDeviceUuid) =>
+        return callback new Error('Could not find or create credentials device') if error?
+        @_addCredsToDeviceWhitelist {uuid, token, owner, credentialsDeviceUuid}, callback
 
+  _addCredsToDeviceWhitelist: ({uuid, token, owner, credentialsDeviceUuid}, callback) =>
+    meshbluJson = _.extend {}, new MeshbluConfig().toJSON(), {uuid, token}
+    userMeshbluHttp = new MeshbluHttp meshbluJson
+    updateOptions =
+      $set:
+        owner: owner
+      $addToSet:
+        sendAsWhitelist: credentialsDeviceUuid
+        receiveAsWhitelist: credentialsDeviceUuid
+      # $unset:
+      #   encryptedOptions: true
+
+    userMeshbluHttp.updateDangerously uuid, updateOptions, (error) =>
+      userMeshbluHttp.whoami callback
 
   _getEncryptedOptionsFromDevice: ({uuid, token}, callback) =>
-    meshbluJson = _.extend new MeshbluConfig().toJSON(), {uuid, token}
+    meshbluJson = _.extend {}, new MeshbluConfig().toJSON(), {uuid, token}
     meshblu = new MeshbluHttp meshbluJson
     meshblu.device uuid, (error, device) =>
       return callback error if error?

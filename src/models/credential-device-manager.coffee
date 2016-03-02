@@ -9,8 +9,8 @@ class CredentialDeviceManager
 
   create: ({clientID, clientSecret}, callback) =>
     options = {clientID, clientSecret, owner: @meshbluConfig.uuid}
-    @meshbluHttp.register options, (error, result) =>
-      callback error, result
+    @meshbluHttp.register options, (error, {uuid}) =>
+      callback error, uuid
 
   updateOrCreate: ({clientID, clientSecret}, callback) =>
     @meshbluHttp.devices {clientID: clientID, owner: @meshbluConfig.uuid}, (error, result) =>
