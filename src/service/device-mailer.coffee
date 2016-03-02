@@ -1,6 +1,7 @@
 _                 = require 'lodash'
 nodemailer        = require 'nodemailer'
 MeshbluHttp       = require 'meshblu-http'
+MeshbluConfig     = require 'meshblu-config'
 
 defaultUserDevice = require '../../data/device-user-config.json'
 ChannelEncryption = require '../models/channel-encryption'
@@ -48,7 +49,7 @@ class MailerService
 
   _encryptAndUpdate: ({auth, options}, callback) =>
     return callback() if _.isEmpty options
-    encryptedOptions = @channelEncryption.encryptOptions options
+    encryptedOptions = @channelEncryption.encryptOptions uuid: auth.uuid, options: options
 
     meshblu = new MeshbluHttp auth
     meshblu.updateDangerously auth.uuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
@@ -75,7 +76,7 @@ class MailerService
         to: options.auth.user
         from: options.auth.user
         subject: "Verify Email"
-        text: "http://device-mailer.octoblu.dev/device/verify?code=#{code}"
+        text: "http://device-mailer.octoblu.dev/device/verify?code=#{code}&timestamp=#{Date.now()}"
 
       callback null, message
 
@@ -89,5 +90,22 @@ class MailerService
       meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: userDeviceUuid, callback
 
   linkToCredentialsDevice: (code, callback) =>
-    callback null, @channelEncryption.codeToAuth code
+    {uuid, token, verified} = @channelEncryption.codeToAuth code
+    return callback(@_userError 'Code could not be verified', 401) unless verified
+    @_getEncryptedOptionsFromDevice {uuid, token}, callback
+
+  _getEncryptedOptionsFromDevice: ({uuid, token}, callback) =>
+    meshbluJson = _.extend new MeshbluConfig().toJSON(), {uuid, token}
+    meshblu = new MeshbluHttp meshbluJson
+    meshblu.device uuid, (error, device) =>
+      return callback error if error?
+      optionsEnvelope = @channelEncryption.decryptOptions device.encryptedOptions
+      return @_userError "Options did not origininate from this device", 401 unless optionsEnvelope.uuid = uuid
+      callback null, optionsEnvelope.options
+
+  _userError: (message, code) =>
+    error = new Error message
+    error.code = code
+    return error
+
 module.exports = MailerService
