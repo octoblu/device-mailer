@@ -4,11 +4,14 @@ MeshbluHttp       = require 'meshblu-http'
 MeshbluConfig     = require 'meshblu-config'
 
 defaultUserDevice = require '../../data/device-user-config.json'
+
 ChannelEncryption = require '../models/channel-encryption'
+CredentialDeviceManager = require '../models/credential-device-manager'
 
 class MailerService
   constructor: ({@meshbluConfig}) ->
-    @channelEncryption = new ChannelEncryption @meshbluConfig.privateKey
+    @channelEncryption = new ChannelEncryption {@meshbluConfig}
+    @credentialDeviceManager = new CredentialDeviceManager {@meshbluConfig}
 
   onCreate: ({metadata, data}, callback) =>
     {auth} = metadata
@@ -62,8 +65,6 @@ class MailerService
 
   getUserDeviceData: ({auth, owner}) =>
     deviceData = _.cloneDeep defaultUserDevice
-    deviceData.owner = owner
-
     return deviceData
 
   getVerificationMessage: ({auth, options}, callback) =>
@@ -89,10 +90,13 @@ class MailerService
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
       meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: userDeviceUuid, callback
 
-  linkToCredentialsDevice: (code, callback) =>
+  linkToCredentialsDevice: ({code, owner}, callback) =>
     {uuid, token, verified} = @channelEncryption.codeToAuth code
     return callback(@_userError 'Code could not be verified', 401) unless verified
-    @_getEncryptedOptionsFromDevice {uuid, token}, callback
+    @_getEncryptedOptionsFromDevice {uuid, token}, (error, options) =>
+      clientID = @_getClientID options
+      @credentialDeviceManager.findOrCreate {clientID, clientSecret: options}, callback
+
 
   _getEncryptedOptionsFromDevice: ({uuid, token}, callback) =>
     meshbluJson = _.extend new MeshbluConfig().toJSON(), {uuid, token}
@@ -107,5 +111,8 @@ class MailerService
     error = new Error message
     error.code = code
     return error
+
+  _getClientID: (options) =>
+    options.auth.user
 
 module.exports = MailerService

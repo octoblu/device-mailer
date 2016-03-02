@@ -34,8 +34,8 @@ class CredentialsController
     throw new Error('Implement authorized plz')
 
   verify: (req, res) =>
-    @service.linkToCredentialsDevice req.query.code, (error, data) =>
-      res.send(error.code || 500).send(error.message) if error?
+    @service.linkToCredentialsDevice {code: req.query.code, owner: req.meshbluAuth.uuid}, (error, data) =>
+      res.status(error.code || 500).send(error.message) if error?
       res.status(200).send data
 
 module.exports = CredentialsController
