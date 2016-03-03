@@ -11,7 +11,7 @@ CredentialDeviceManager = require '../models/credential-device-manager'
 class MailerService
   constructor: ({@meshbluConfig}) ->
     @channelEncryption = new ChannelEncryption {@meshbluConfig}
-    @credentialDeviceManager = new CredentialDeviceManager {@meshbluConfig, serviceUrl: ""}
+    @credentialDeviceManager = new CredentialDeviceManager {@meshbluConfig}
 
   onCreate: ({metadata, data}, callback) =>
     {auth} = metadata
@@ -116,6 +116,7 @@ class MailerService
     updateOptions =
       $set:
         owner: owner
+        secureConfig: true
       $addToSet:
         sendAsWhitelist: credentialsDeviceUuid
         receiveAsWhitelist: credentialsDeviceUuid
