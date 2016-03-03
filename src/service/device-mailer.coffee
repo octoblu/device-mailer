@@ -6,12 +6,12 @@ MeshbluConfig     = require 'meshblu-config'
 defaultUserDevice = require '../../data/device-user-config.json'
 
 ChannelEncryption = require '../models/channel-encryption'
-CredentialDeviceManager = require '../models/credential-device-manager'
+ServiceDevice = require '../models/service-device'
 
 class MailerService
   constructor: ({@meshbluConfig}) ->
     @channelEncryption = new ChannelEncryption {@meshbluConfig}
-    @credentialDeviceManager = new CredentialDeviceManager {@meshbluConfig}
+    @serviceDevice = new ServiceDevice {@meshbluConfig}
 
   onCreate: ({metadata, data}, callback) =>
     {auth} = metadata
@@ -100,39 +100,17 @@ class MailerService
   linkToCredentialsDevice: ({code, owner}, callback) =>
     {uuid, token, verified} = @channelEncryption.codeToAuth code
     return callback(@_userError 'Code could not be verified', 401) unless verified
+    userDevice = new UserDevice( new MeshbluConfig {uuid, token})
 
-    @_getEncryptedOptionsFromDevice {uuid, token}, (error, options) =>
+    userDevice.getEncryptedOptions (error, options) =>
       clientID = @_getClientID options
       clientSecret = @_getClientSecret options
-      @credentialDeviceManager.updateOrCreate {clientID, clientSecret}, (error, credentialsDeviceUuid) =>
+
+      @serviceDevice.findOrCreateCredentialsDevice {clientID}, (error, credentialsDevice) =>
         return callback new Error('Could not find or create credentials device') if error?
-        @_addCredsToDeviceWhitelist {uuid, token, owner, credentialsDeviceUuid}, (error) =>
+        @credentialsDevice.updateClientSecret {clientSecret}, (error) =>
           return callback error if error?
-          @credentialDeviceManager.subscribeToUserDevice {uuid: credentialsDeviceUuid, userDeviceUuid: uuid}, callback
-
-  _addCredsToDeviceWhitelist: ({uuid, token, owner, credentialsDeviceUuid}, callback) =>
-    meshbluJson = _.extend {}, new MeshbluConfig().toJSON(), {uuid, token}
-    userMeshbluHttp = new MeshbluHttp meshbluJson
-    updateOptions =
-      $set:
-        owner: owner
-        secureConfig: true
-      $addToSet:
-        sendAsWhitelist: credentialsDeviceUuid
-        receiveAsWhitelist: credentialsDeviceUuid
-      # $unset:
-      #   encryptedOptions: true
-
-    userMeshbluHttp.updateDangerously uuid, updateOptions, callback
-
-  _getEncryptedOptionsFromDevice: ({uuid, token}, callback) =>
-    meshbluJson = _.extend {}, new MeshbluConfig().toJSON(), {uuid, token}
-    meshblu = new MeshbluHttp meshbluJson
-    meshblu.device uuid, (error, device) =>
-      return callback error if error?
-      optionsEnvelope = @channelEncryption.decryptOptions device.encryptedOptions
-      return @_userError "Options did not origininate from this device", 401 unless optionsEnvelope.uuid = uuid
-      callback null, optionsEnvelope.options
+          @credentialsDevice.addUserDevice userDevice, callback  
 
   _userError: (message, code) =>
     error = new Error message

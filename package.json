@@ -16,7 +16,7 @@
     "express": "^4.13.4",
     "express-meshblu-auth": "^3.0.0",
     "express-meshblu-healthcheck": "^1.0.1",
-    "meshblu-config": "^3.2.0",
+    "meshblu-config": "^4.0.0",
     "morgan": "^1.6.1",
     "node-rsa": "^0.2.23",
     "nodemailer": "^2.1.0",

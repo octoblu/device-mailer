@@ -1,12 +1,24 @@
-_ = require 'lodash'
-MeshbluHttp = require 'meshblu-http'
+Device     = require 'device'
+UserDevice = require 'user-device'
 
-class CredentialsDevice
-  constructor: ({@meshbluConfig}, dependencies={}) ->
-    @meshbluHttp = new MeshbluHttp @meshbluConfig
+class CredentialsDevice extends Device
+  
+  updateClientSecret: ({clientSecret}, callback) =>
+    @meshbluHttp.update deviceUuid, clientSecret: clientSecret, callback
 
-  updateClientSecret: (clientSecret, callback) =>
+  addUserDevice: ({uuid, token}) =>
+    userDevice = new UserDevice({uuid, token})
+    userDevice.addToWhitelist @uuid, (error) =>
+      return callback error if error?
+      @subscribeTo uuid: userDevice.uuid, callback
 
-  subscribeToUserDevice: (uuid) =>
-    
+  subscribeTo: ({uuid}, callback) =>
+    @meshbluHttp.createSubscription {
+      subscriberUuid: @meshbluConfig.uuid
+      emitterUuid:uuid
+      type:'received'
+    }, callback
+
+
+
 module.exports = CredentialsDevice
