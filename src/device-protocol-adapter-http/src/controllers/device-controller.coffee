@@ -5,32 +5,29 @@ _ = require 'lodash'
 class DeviceController
   constructor: ({@service}) ->
 
-  getUserDeviceConfig: (req, callback) =>
+  getDeviceConfig: (req, callback) =>
     meshblu = new MeshbluHttp req.meshbluAuth
-    userDeviceUuid = req.meshbluAuth.uuid
-    userDeviceUuid = _.first req.body.forwardedFor unless _.isEmpty req.body.forwardedFor
-
-    meshblu.device userDeviceUuid, (error, userDevice) =>
+    meshblu.whoami (error, device) =>
       return callback error if error?
-      callback null, userDevice
+      callback null, device
 
   getReceivedEnvelope: (req, callback) =>
     message = req.body
     message = req.body.payload if req.body.payload?
 
-    @getUserDeviceConfig req, (error, userDevice) =>
+    @getDeviceConfig req, (error, device) =>
       return callback error if error?
       envelope =
         metadata:
           auth: req.meshbluAuth
         message: message.message
-        config: userDevice
+        config: device
 
       debug 'receivedEnvelope', envelope
       callback null, envelope
 
   getConfigEnvelope: (req, callback) =>
-    @getUserDeviceConfig req, (error, userDevice) =>
+    @getDeviceConfig req, (error, userDevice) =>
       debug 'userDevice', userDevice
       return callback error if error?
       envelope =
@@ -51,10 +48,8 @@ class DeviceController
         res.sendStatus 200
 
   received: (req, res) =>
-    debug 'received', req.body
     @getReceivedEnvelope req, (error, envelope) =>
       return res.sendStatus(error.code || 500) if error?
-
       @service.onReceived envelope, =>
         return res.sendStatus(error.code || 500) if error?
         res.sendStatus 200

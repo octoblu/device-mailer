@@ -24,6 +24,7 @@ class CredentialsController
         host: "device-editor-octoblu.octoblu.dev/#{device.uuid}"
         query:
           token: device.token
+          protocol: req.meshbluAuth.protocol
           server: req.meshbluAuth.host
           port: req.meshbluAuth.port
           callbackURL: "http://device-mailer.octoblu.dev/device/configured"

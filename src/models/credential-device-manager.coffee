@@ -1,14 +1,17 @@
 _ = require 'lodash'
 MeshbluHttp = require 'meshblu-http'
+credentialsDeviceData = require '../../data/credentials-device-data'
+
 class CredentialDeviceManager
-  constructor: ({@meshbluConfig}, dependencies={}) ->
+  constructor: ({@meshbluConfig, serviceUrl}, dependencies={}) ->
     @meshbluHttp = new MeshbluHttp @meshbluConfig
 
   addUserDevice: (deviceUuid, userDeviceUuid, callback) =>
     @meshbluHttp.updateDangerously deviceUuid, $addToSet: {sendWhitelist: userDeviceUuid}, callback
 
   create: ({clientID, clientSecret}, callback) =>
-    options = {clientID, clientSecret, owner: @meshbluConfig.uuid}
+    options = _.extend {clientID, clientSecret, owner: @meshbluConfig.uuid}, credentialsDeviceData
+
     @meshbluHttp.register options, (error, {uuid}) =>
       callback error, uuid
 
@@ -20,6 +23,9 @@ class CredentialDeviceManager
       {uuid}= _.first result
       @updateClientSecret uuid, clientSecret, (error) =>
         callback error, uuid
+
+  subscribeToUserDevice: ({uuid, userDeviceUuid}, callback) =>
+    @meshbluHttp.createSubscription {subscriberUuid:uuid, emitterUuid:userDeviceUuid, type:'received'}, callback
 
   generateToken: (uuid, callback) =>
     meshbluHttp = new @MeshbluHttp @meshbluConfig
