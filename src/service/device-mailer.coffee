@@ -22,7 +22,7 @@ class MailerService
   onConfig: ({metadata, config}, callback) =>
     {options, encryptedOptions} = config
     {auth} = metadata
-    return callback() unless options?
+    return callback() if _.isEmpty options
 
     @_encryptAndUpdate {auth, options}, (error) =>
       @getVerificationMessage {auth, options}, (error, message) =>
