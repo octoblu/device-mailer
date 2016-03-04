@@ -1,7 +1,6 @@
 _                 = require 'lodash'
 nodemailer        = require 'nodemailer'
 MeshbluHttp       = require 'meshblu-http'
-MeshbluConfig     = require 'meshblu-config'
 
 defaultUserDevice = require '../../data/device-user-config.json'
 
@@ -11,8 +10,9 @@ UserDevice        = require '../models/user-device'
 
 class MailerService
   constructor: ({@meshbluConfig}) ->
-    @channelEncryption = new ChannelEncryption {@meshbluConfig}
-    @serviceDevice = new ServiceDevice {@meshbluConfig}
+    console.log @meshbluConfig
+    @channelEncryption = new ChannelEncryption @meshbluConfig
+    @serviceDevice     = new ServiceDevice @meshbluConfig
 
   onCreate: ({metadata, data}, callback) =>
     {auth} = metadata
@@ -21,13 +21,17 @@ class MailerService
     @createDevice {auth, owner}, callback
 
   onConfig: ({metadata, config}, callback) =>
-    {options, encryptedOptions} = config
+    {options, encryptedOptions, lastEncrypted} = config
     {auth} = metadata
     return callback() unless options?
-    userMeshbluConfig = new MeshbluConfig({uuid: auth.uuid, token: auth.token})
-    userDevice = new UserDevice meshbluConfig: userMeshbluConfig
 
+    if lastEncrypted? && (Date.now() - lastEncrypted) < 1000
+      return callback @_userError("Verification request detected within 1 second of last request", 403)
+
+    userDevice = new UserDevice auth
     userDevice.setEncryptedOptions {options}, (error) =>
+      return callback error if error?
+
       @getVerificationMessage {auth, options}, (error, message) =>
         return callback error if error?
         options =
@@ -96,17 +100,18 @@ class MailerService
   linkToCredentialsDevice: ({code, owner}, callback) =>
     {uuid, token, verified} = @channelEncryption.codeToAuth code
     return callback(@_userError 'Code could not be verified', 401) unless verified
-    userDevice = new UserDevice( new MeshbluConfig {uuid, token})
 
-    userDevice.getEncryptedOptions (error, options) =>
+    userDevice = new UserDevice {uuid, token}
+
+    userDevice.getDecryptedOptions (error, options) =>
       clientID = @_getClientID options
       clientSecret = @_getClientSecret options
 
       @serviceDevice.findOrCreateCredentialsDevice {clientID}, (error, credentialsDevice) =>
         return callback new Error('Could not find or create credentials device') if error?
-        @credentialsDevice.updateClientSecret {clientSecret}, (error) =>
+        credentialsDevice.updateClientSecret {clientSecret}, (error) =>
           return callback error if error?
-          @credentialsDevice.addUserDevice userDevice, callback
+          credentialsDevice.addUserDevice userDevice, callback
 
   _userError: (message, code) =>
     error = new Error message

@@ -1,8 +1,7 @@
 NodeRSA           = require 'node-rsa'
 
 class ChannelEncryption
-  constructor: ({meshbluConfig}) ->
-    {privateKey} = meshbluConfig
+  constructor: ({privateKey}) -> 
     throw new Error('Private key not found!') unless privateKey?
     @key = @getPrivateKey privateKey
 
