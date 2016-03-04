@@ -12,6 +12,7 @@ class DeviceController
       callback null, device
 
   getReceivedEnvelope: (req, callback) =>
+    console.log 'BODY', req.body
     message = req.body
     message = req.body.payload if req.body.payload?
 
@@ -20,6 +21,7 @@ class DeviceController
       envelope =
         metadata:
           auth: req.meshbluAuth
+          forwardedFor: req.body.forwardedFor
         message: message.message
         config: device
 

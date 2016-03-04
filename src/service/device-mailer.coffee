@@ -10,7 +10,6 @@ UserDevice        = require '../models/user-device'
 
 class MailerService
   constructor: ({@meshbluConfig}) ->
-    console.log @meshbluConfig
     @channelEncryption = new ChannelEncryption @meshbluConfig
     @serviceDevice     = new ServiceDevice @meshbluConfig
 
@@ -43,7 +42,7 @@ class MailerService
         @processMessage options, callback
 
   onReceived: ({metadata, message, config}, callback) =>
-    {auth} = metadata
+    {auth, forwardedFor} = metadata
     # {encryptedOptions} = config
     # # unless encryptedOptions?
     # #   return meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, as: config.uuid, callback
@@ -55,7 +54,7 @@ class MailerService
     # #     options: options
     # #     message: message
     options =
-      userDeviceUuid: config.uuid
+      userDeviceUuid: _.first forwardedFor
       auth: auth
       options: config.clientSecret
       message: message

@@ -4,7 +4,6 @@ MeshbluHttp = require 'meshblu-http'
 Device      = require './device'
 
 class UserDevice extends Device
-    
   addToWhitelist: ({uuid}, callback) =>
     debug 'addToWhitelist', {uuid}
     updateOptions =
