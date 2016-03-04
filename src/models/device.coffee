@@ -17,4 +17,7 @@ class Device
     error.code = code
     return error
 
+  get: (callback) =>
+    @meshbluHttp.whoami callback
+
 module.exports = Device

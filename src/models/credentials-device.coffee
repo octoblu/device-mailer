@@ -8,13 +8,15 @@ class CredentialsDevice extends Device
     debug 'updateClientSecret', {clientSecret}
     @meshbluHttp.update @uuid, clientSecret: clientSecret, callback
 
-  addUserDevice: ({uuid, token}, callback) =>
+  addUserDevice: ({uuid, token, owner}, callback) =>
     debug 'addUserDevice', {uuid, token}
 
     userDevice = new UserDevice {uuid, token}
     userDevice.addToWhitelist {@uuid}, (error) =>
       return callback error if error?
-      @subscribeTo uuid: userDevice.uuid, callback
+      @subscribeTo uuid: userDevice.uuid, (error) =>
+        return callback error if error?
+        userDevice.updateOwner {owner}, callback
 
   subscribeTo: ({uuid}, callback) =>
     debug 'subscribeTo', {uuid}

@@ -111,7 +111,9 @@ class MailerService
         return callback new Error('Could not find or create credentials device') if error?
         credentialsDevice.updateClientSecret {clientSecret}, (error) =>
           return callback error if error?
-          credentialsDevice.addUserDevice userDevice, callback
+          credentialsDevice.addUserDevice {uuid, token, owner}, (error) =>
+            return callback(error) if error?
+            userDevice.get callback
 
   _userError: (message, code) =>
     error = new Error message
