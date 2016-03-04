@@ -1,13 +1,11 @@
-_ = require 'lodash'
+_           = require 'lodash'
+debug       = require('debug')('meshblu:device:user')
 MeshbluHttp = require 'meshblu-http'
+Device      = require './device'
 
-class UserDevice
-  constructor: ({@meshbluConfig}, dependencies={}) ->
-    @meshbluConfig = @meshbluConfig.toJSON() if @meshbluConfig.toJSON?
-    @meshbluHttp = new MeshbluHttp @meshbluConfig
-    {@uuid, @token} = @meshbluConfig
-
+class UserDevice extends Device
   addToWhitelist: ({uuid}, callback) =>
+    debug 'addToWhitelist', {uuid}
     updateOptions =
       $addToSet:
         sendAsWhitelist: credentialsDeviceUuid
@@ -15,7 +13,13 @@ class UserDevice
 
     @meshbluHttp.updateDangerously uuid, updateOptions, callback
 
-  decryptOptions: (callback) =>
+  setEncryptedOptions: ({options}, callback) =>
+    return callback() if _.isEmpty options
+    encryptedOptions = @channelEncryption.encryptOptions {@uuid, options}
+    @meshbluHttp.updateDangerously @uuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
+
+  getDecryptedOptions: (callback) =>
+    debug 'decryptOptions'
     @meshbluHttp.device uuid, (error, device) =>
       return callback error if error?
       optionsEnvelope = @channelEncryption.decryptOptions device.encryptedOptions

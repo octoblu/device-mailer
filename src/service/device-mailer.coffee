@@ -6,7 +6,8 @@ MeshbluConfig     = require 'meshblu-config'
 defaultUserDevice = require '../../data/device-user-config.json'
 
 ChannelEncryption = require '../models/channel-encryption'
-ServiceDevice = require '../models/service-device'
+ServiceDevice     = require '../models/service-device'
+UserDevice        = require '../models/user-device'
 
 class MailerService
   constructor: ({@meshbluConfig}) ->
@@ -22,9 +23,11 @@ class MailerService
   onConfig: ({metadata, config}, callback) =>
     {options, encryptedOptions} = config
     {auth} = metadata
-    return callback() if _.isEmpty options
+    return callback() unless options?
+    userMeshbluConfig = new MeshbluConfig({uuid: auth.uuid, token: auth.token})
+    userDevice = new UserDevice meshbluConfig: userMeshbluConfig
 
-    @_encryptAndUpdate {auth, options}, (error) =>
+    userDevice.setEncryptedOptions {options}, (error) =>
       @getVerificationMessage {auth, options}, (error, message) =>
         return callback error if error?
         options =
@@ -54,13 +57,6 @@ class MailerService
       message: message
 
     @processMessage options, callback
-
-  _encryptAndUpdate: ({auth, options}, callback) =>
-    return callback() if _.isEmpty options
-    encryptedOptions = @channelEncryption.encryptOptions uuid: auth.uuid, options: options
-
-    meshblu = new MeshbluHttp auth
-    meshblu.updateDangerously auth.uuid, {$set: {encryptedOptions: encryptedOptions}, $unset: {options: true}}, callback
 
   createDevice: ({auth, owner}, callback) =>
     deviceData = @getUserDeviceData({auth, owner})
@@ -110,7 +106,7 @@ class MailerService
         return callback new Error('Could not find or create credentials device') if error?
         @credentialsDevice.updateClientSecret {clientSecret}, (error) =>
           return callback error if error?
-          @credentialsDevice.addUserDevice userDevice, callback  
+          @credentialsDevice.addUserDevice userDevice, callback
 
   _userError: (message, code) =>
     error = new Error message
