@@ -4,17 +4,19 @@ MeshbluHttp = require 'meshblu-http'
 Device      = require './device'
 
 class UserDevice extends Device
-  addToWhitelist: ({uuid}, callback) =>
-    debug 'addToWhitelist', {uuid}
+  linkToCredentialsAndOwner: ({owner, credentialsUuid}, callback) =>
     updateOptions =
       $addToSet:
-        sendAsWhitelist: uuid
-        receiveAsWhitelist: uuid
+        sendAsWhitelist: credentialsUuid
+        receiveAsWhitelist: credentialsUuid
+      $set:
+        owner: owner
+      $unset:
+        encryptedOptions : true
 
-    @meshbluHttp.updateDangerously @uuid, updateOptions, callback
-
-  updateOwner: ({owner}, callback) =>
-    @meshbluHttp.updateDangerously @uuid, $set: {owner}, callback
+    @meshbluHttp.updateDangerously @uuid, updateOptions, (error) =>
+      return callback error if error?
+      @meshbluHttp.revokeToken @uuid, @token, callback
 
   setEncryptedOptions: ({options}, callback) =>
     return callback() if _.isEmpty options

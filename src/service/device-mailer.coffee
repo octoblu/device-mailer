@@ -103,6 +103,7 @@ class MailerService
     userDevice = new UserDevice {uuid, token}
 
     userDevice.getDecryptedOptions (error, options) =>
+      return callback error if error?
       clientID = @_getClientID options
       clientSecret = @_getClientSecret options
 
@@ -111,8 +112,7 @@ class MailerService
         credentialsDevice.updateClientSecret {clientSecret}, (error) =>
           return callback error if error?
           credentialsDevice.addUserDevice {uuid, token, owner}, (error) =>
-            return callback(error) if error?
-            userDevice.get callback
+            credentialsDevice.getUserDevices callback
 
   _userError: (message, code) =>
     error = new Error message

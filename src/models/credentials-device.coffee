@@ -12,11 +12,10 @@ class CredentialsDevice extends Device
     debug 'addUserDevice', {uuid, token}
 
     userDevice = new UserDevice {uuid, token}
-    userDevice.addToWhitelist {@uuid}, (error) =>
+    userDevice.linkToCredentialsAndOwner credentialsUuid: @uuid, owner: owner, (error) =>
       return callback error if error?
-      @subscribeTo uuid: userDevice.uuid, (error) =>
-        return callback error if error?
-        userDevice.updateOwner {owner}, callback
+      @subscribeTo uuid: userDevice.uuid, callback        
+
 
   subscribeTo: ({uuid}, callback) =>
     debug 'subscribeTo', {uuid}
@@ -25,5 +24,8 @@ class CredentialsDevice extends Device
       emitterUuid:uuid
       type:'received'
     }, callback
+
+  getUserDevices: (callback) =>
+    @meshbluHttp.subscriptions @uuid, callback
 
 module.exports = CredentialsDevice
