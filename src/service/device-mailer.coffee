@@ -6,6 +6,7 @@ defaultUserDevice = require '../../data/device-user-config.json'
 
 ChannelEncryption = require '../models/channel-encryption'
 ServiceDevice     = require '../models/service-device'
+CredentialsDevice = require '../models/credentials-device'
 UserDevice        = require '../models/user-device'
 
 class MailerService
@@ -41,25 +42,22 @@ class MailerService
 
         @processMessage options, callback
 
-  onReceived: ({metadata, message, config}, callback) =>
+  onReceived: ({metadata, message}, callback) =>
     {auth, forwardedFor} = metadata
-    # {encryptedOptions} = config
-    # # unless encryptedOptions?
-    # #   return meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, as: config.uuid, callback
-    # #
-    # # @channelEncryption.decryptOptions encryptedOptions, (error, options) =>
-    # #   options =
-    # #     userDeviceUuid: config.uuid
-    # #     auth: auth
-    # #     options: options
-    # #     message: message
-    options =
-      userDeviceUuid: _.first forwardedFor
-      auth: auth
-      options: config.clientSecret
-      message: message
+    originalDevice = _.first forwardedFor
+    credentialsDevice = new CredentialsDevice auth
+    credentialsDevice.getClientSecret (error, clientSecret) =>
+      return callback error if error?
+      unless clientSecret?
+        return meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, as: originalDevice, callback
 
-    @processMessage options, callback
+      options =
+        originalDevice: originalDevice
+        auth: auth
+        options: clientSecret
+        message: message
+
+      @processMessage options, callback
 
   createDevice: ({auth, owner}, callback) =>
     deviceData = @getUserDeviceData({auth, owner})
@@ -85,8 +83,8 @@ class MailerService
 
       callback null, message
 
-  processMessage: ({userDeviceUuid, auth, options, message}, callback) =>
-    console.log "processMessage", {userDeviceUuid, auth, options, message}
+  processMessage: ({originalDevice, auth, options, message}, callback) =>
+    console.log "processMessage", {originalDevice, auth, options, message}
 
     meshblu = new MeshbluHttp auth
     {transportOptions, transporter} = options
@@ -94,7 +92,7 @@ class MailerService
       transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
 
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
-      meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: userDeviceUuid, callback
+      meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: originalDevice, callback
 
   linkToCredentialsDevice: ({code, owner}, callback) =>
     {uuid, token, verified} = @channelEncryption.codeToAuth code
@@ -109,7 +107,7 @@ class MailerService
 
       @serviceDevice.findOrCreateCredentialsDevice {clientID}, (error, credentialsDevice) =>
         return callback new Error('Could not find or create credentials device') if error?
-        credentialsDevice.updateClientSecret {clientSecret}, (error) =>
+        credentialsDevice.setClientSecret {clientSecret}, (error) =>
           return callback error if error?
           credentialsDevice.addUserDevice {uuid, token, owner}, (error) =>
             credentialsDevice.getUserDevices callback

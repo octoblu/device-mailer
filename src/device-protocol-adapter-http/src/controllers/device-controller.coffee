@@ -12,21 +12,16 @@ class DeviceController
       callback null, device
 
   getReceivedEnvelope: (req, callback) =>
-    console.log 'BODY', req.body
     message = req.body
     message = req.body.payload if req.body.payload?
-
-    @getDeviceConfig req, (error, device) =>
-      return callback error if error?
-      envelope =
-        metadata:
-          auth: req.meshbluAuth
-          forwardedFor: req.body.forwardedFor
-        message: message.message
-        config: device
-
-      debug 'receivedEnvelope', envelope
-      callback null, envelope
+    envelope =
+      metadata:
+        auth: req.meshbluAuth
+        forwardedFor: req.body.forwardedFor
+      message: message.message
+      
+    debug 'receivedEnvelope', envelope
+    callback null, envelope
 
   getConfigEnvelope: (req, callback) =>
     @getDeviceConfig req, (error, userDevice) =>
@@ -37,7 +32,6 @@ class DeviceController
           auth: req.meshbluAuth
         config: userDevice
 
-      # debug 'configEnvelope', JSON.stringify envelope,null,2
       callback null, envelope
 
   config: (req, res) =>
