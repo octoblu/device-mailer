@@ -31,9 +31,7 @@ class UserDevice extends Device
     @meshbluHttp.updateDangerously @uuid, updateOptions, callback
 
   getDecryptedOptions: (callback) =>
-    debug 'getDecryptOptions'
     @meshbluHttp.device @uuid, (error, device) =>
-      debug 'getDecryptOptions', {error, device}
       return callback error if error?
       optionsEnvelope = @channelEncryption.decryptOptions device.encryptedOptions
       return @_userError "Options did not origininate from this device", 401 unless optionsEnvelope.uuid = @uuid

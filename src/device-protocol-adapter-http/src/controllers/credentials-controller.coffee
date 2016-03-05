@@ -31,9 +31,6 @@ class CredentialsController
 
       res.redirect editUrl
 
-  authorized: (req, res) =>
-    throw new Error('Implement authorized plz')
-
   verify: (req, res) =>
     @service.linkToCredentialsDevice {code: req.query.code, owner: req.meshbluAuth.uuid}, (error, data) =>
       res.status(error.code || 500).send(error.message) if error?

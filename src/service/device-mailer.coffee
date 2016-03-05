@@ -1,7 +1,7 @@
 _                 = require 'lodash'
 nodemailer        = require 'nodemailer'
 MeshbluHttp       = require 'meshblu-http'
-
+MeshbluConfig     = require 'meshblu-config'
 defaultUserDevice = require '../../data/device-user-config.json'
 
 ChannelEncryption = require '../models/channel-encryption'
@@ -43,16 +43,18 @@ class MailerService
         @processMessage options, callback
 
   onReceived: ({metadata, message}, callback) =>
-    {auth, forwardedFor} = metadata
-    originalDevice = _.first forwardedFor
+    {auth, forwardedFor, fromUuid} = metadata
+    originalDevice = _.last forwardedFor
+
     credentialsDevice = new CredentialsDevice auth
     credentialsDevice.getClientSecret (error, clientSecret) =>
       return callback error if error?
       unless clientSecret?
-        return meshblu.message {devices: ['*'], result: {error: 'encrypted options not found'}}, as: originalDevice, callback
+        return meshblu.message {devices: [fromUuid], result: {error: 'encrypted options not found'}}, as: originalDevice, callback
 
       options =
         originalDevice: originalDevice
+        fromUuid: fromUuid
         auth: auth
         options: clientSecret
         message: message
@@ -83,16 +85,15 @@ class MailerService
 
       callback null, message
 
-  processMessage: ({originalDevice, auth, options, message}, callback) =>
-    console.log "processMessage", {originalDevice, auth, options, message}
+  processMessage: ({originalDevice, auth, options, message, fromUuid}, callback) =>
+    meshblu = new MeshbluHttp new MeshbluConfig(auth).toJSON()
 
-    meshblu = new MeshbluHttp auth
     {transportOptions, transporter} = options
     if transporter
       transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
 
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
-      meshblu.message {devices: ['*'], result: {error: err?.message,info}}, as: originalDevice, callback
+      meshblu.message {devices: [fromUuid], result: {error: err?.message,info}}, as: originalDevice, callback
 
   linkToCredentialsDevice: ({code, owner}, callback) =>
     {uuid, token, verified} = @channelEncryption.codeToAuth code

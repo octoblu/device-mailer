@@ -10,14 +10,9 @@ class Device
     @meshbluHttp       = new MeshbluHttp meshbluConfig
     @channelEncryption = new ChannelEncryption meshbluConfig
 
-    debug "instantiated device #{@uuid} : #{@token}"
-
   _userError: (message, code) =>
     error = new Error message
     error.code = code
     return error
-
-  get: (callback) =>
-    @meshbluHttp.whoami callback
 
 module.exports = Device
