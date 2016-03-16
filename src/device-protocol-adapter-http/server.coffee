@@ -9,10 +9,11 @@ MeshbluConfig      = require 'meshblu-config'
 Router             = require './router'
 
 class Server
-  constructor: ({@disableLogging, @port, @service, @serviceUrl}, {@meshbluConfig}={})->
+  constructor: ({@disableLogging, @port, @service, @serviceUrl, @octobluOauthUrl}, {@meshbluConfig}={})->
     @meshbluConfig ?= new MeshbluConfig().toJSON()
-    @serviceUrl ?= process.env.SERVICE_URL
-    
+    @serviceUrl    ?= process.env.SERVICE_URL
+    @octobluOauthUrl  ?= process.env.OCTOBLU_OAUTH_URL
+
   address: =>
     @server.address()
 
@@ -28,7 +29,7 @@ class Server
 
     app.options '*', cors()
 
-    router = new Router {@meshbluConfig, @service, @serviceUrl}
+    router = new Router {@meshbluConfig, @service, @serviceUrl, @octobluOauthUrl}
 
     router.route app
 

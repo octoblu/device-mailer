@@ -11,7 +11,6 @@ UserDevice         = require '../models/user-device'
 
 class MailerService
   constructor: ({meshbluConfig, @serviceUrl}) ->
-    throw new Error('serviceUrl is required in order for things to actually work') unless @serviceUrl?
     credentialsDeviceConfig = @_getCredentialsDeviceConfig {@serviceUrl}
 
     @userDeviceConfig       = @_getUserDeviceConfig {@serviceUrl}

@@ -6,7 +6,8 @@ CredentialsController = require './src/controllers/credentials-controller'
 OctobluStrategy       = require 'passport-octoblu'
 
 class Router
-  constructor: ({service, @serviceUrl, @meshbluConfig}, dependencies={}) ->
+  constructor: ({service, @serviceUrl, @octobluOauthUrl, @oauthClientID, @oauthClientSecret, @meshbluConfig}, dependencies={}) ->
+    
     @deviceController      = new DeviceController {service, @serviceUrl}
     @credentialsController = new CredentialsController {service, @serviceUrl}
 
@@ -36,8 +37,8 @@ class Router
   setupOctobluOauth: ({clientID, clientSecret}) =>
     octobluStrategyConfig =
       clientID: clientID
-      authorizationURL: 'http://oauth.octoblu.dev/authorize'
-      tokenURL: 'http://oauth.octoblu.dev/access_token'
+      authorizationURL: "#{@octobluOauthUrl}/authorize"
+      tokenURL: "#{@octobluOauthUrl}/access_token"
       clientSecret: clientSecret
       callbackURL: "#{@serviceUrl}/octoblu/authenticate"
       passReqToCallback: true
