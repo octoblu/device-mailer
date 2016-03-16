@@ -1,7 +1,17 @@
-Device     = require './device'
-UserDevice = require './user-device'
+MeshbluHttp       = require 'meshblu-http'
+MeshbluConfig     = require 'meshblu-config'
 
-class CredentialsDevice extends Device
+UserDevice        = require './user-device'
+ChannelEncryption = require '../models/channel-encryption'
+
+class CredentialsDevice
+  constructor: ({meshbluConfig}, dependencies={}) ->
+    meshbluConfig      = new MeshbluConfig(meshbluConfig).toJSON()
+
+    {@uuid, @token}    = meshbluConfig
+    @meshbluHttp       = new MeshbluHttp meshbluConfig
+    @channelEncryption = new ChannelEncryption meshbluConfig
+
   setClientSecret: ({clientSecret}, callback) =>
     clientSecret = @channelEncryption.encryptOptions clientSecret
     @meshbluHttp.update @uuid, clientSecret: clientSecret, callback
@@ -27,5 +37,10 @@ class CredentialsDevice extends Device
 
   getUserDevices: (callback) =>
     @meshbluHttp.subscriptions @uuid, callback
+
+  _userError: (message, code) =>
+    error = new Error message
+    error.code = code
+    return error
 
 module.exports = CredentialsDevice

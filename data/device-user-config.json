@@ -106,7 +106,7 @@
       "config": [
         {
           "type": "webhook",
-          "url": "http://device-mailer.octoblu.dev/events/config",
+          "url": "${serviceUrl}/events/config",
           "method": "POST",
           "generateAndForwardMeshbluCredentials": true
         }

@@ -3,7 +3,11 @@ MailerService = require '.'
 MeshbluConfig = require 'meshblu-config'
 
 ProtocolAdapter = require './src/device-protocol-adapter-http'
-service = new MailerService {meshbluConfig: new MeshbluConfig().toJSON()}
+
+service = new MailerService(
+  meshbluConfig: new MeshbluConfig().toJSON()
+  serviceUrl: process.env.SERVICE_URL
+)
 
 adapter = new ProtocolAdapter {service}
 

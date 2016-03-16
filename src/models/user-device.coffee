@@ -1,9 +1,19 @@
-_           = require 'lodash'
-debug       = require('debug')('meshblu:device:user')
-MeshbluHttp = require 'meshblu-http'
-Device      = require './device'
+_                 = require 'lodash'
+debug             = require('debug')('meshblu:device:user')
 
-class UserDevice extends Device
+MeshbluHttp       = require 'meshblu-http'
+MeshbluConfig     = require 'meshblu-config'
+ChannelEncryption = require '../models/channel-encryption'
+
+
+class UserDevice
+  constructor: ({meshbluConfig}, dependencies={}) ->
+    meshbluConfig      = new MeshbluConfig(meshbluConfig).toJSON()
+
+    {@uuid, @token}    = meshbluConfig
+    @meshbluHttp       = new MeshbluHttp meshbluConfig
+    @channelEncryption = new ChannelEncryption meshbluConfig
+
   linkToCredentialsAndOwner: ({owner, credentialsUuid}, callback) =>
     updateOptions =
       $addToSet:
@@ -36,5 +46,11 @@ class UserDevice extends Device
       optionsEnvelope = @channelEncryption.decryptOptions device.encryptedOptions
       return @_userError "Options did not origininate from this device", 401 unless optionsEnvelope.uuid = @uuid
       callback null, optionsEnvelope.options
+
+  _userError: (message, code) =>
+    error = new Error message
+    error.code = code
+    return error
+
 
 module.exports = UserDevice

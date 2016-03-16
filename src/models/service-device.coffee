@@ -1,11 +1,18 @@
 _                     = require 'lodash'
 debug                 = require('debug')('meshblu:device:service')
 
-Device                = require './device'
-CredentialsDeviceData = require '../../data/credentials-device-data'
+MeshbluHttp           = require 'meshblu-http'
+MeshbluConfig         = require 'meshblu-config'
+
+CredentialsDeviceData = require '../../data/device-credentials-config'
 CredentialsDevice     = require './credentials-device'
 
-class ServiceDevice extends Device
+class ServiceDevice
+  constructor: ({meshbluConfig}, dependencies={}) ->
+    meshbluConfig   = new MeshbluConfig(meshbluConfig).toJSON()
+    {@uuid, @token} = meshbluConfig
+    @meshbluHttp    = new MeshbluHttp meshbluConfig
+
   createCredentialsDevice: ({clientID}, callback) =>
     options = _.extend {clientID, owner: @uuid}, CredentialsDeviceData
     @meshbluHttp.register options, (error, {uuid, token}={}) =>
@@ -21,5 +28,10 @@ class ServiceDevice extends Device
       @meshbluHttp.generateAndStoreToken uuid, (error, {token}={}) =>
         return callback error if error?
         return callback null, new CredentialsDevice {uuid, token}
+
+  _userError: (message, code) =>
+    error = new Error message
+    error.code = code
+    return error
 
 module.exports = ServiceDevice

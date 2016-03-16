@@ -1,24 +1,27 @@
-_                 = require 'lodash'
-nodemailer        = require 'nodemailer'
-MeshbluHttp       = require 'meshblu-http'
-MeshbluConfig     = require 'meshblu-config'
-defaultUserDevice = require '../../data/device-user-config.json'
+fs                 = require 'fs'
+_                  = require 'lodash'
+nodemailer         = require 'nodemailer'
+MeshbluHttp        = require 'meshblu-http'
+MeshbluConfig      = require 'meshblu-config'
 
-ChannelEncryption = require '../models/channel-encryption'
-ServiceDevice     = require '../models/service-device'
-CredentialsDevice = require '../models/credentials-device'
-UserDevice        = require '../models/user-device'
+ChannelEncryption  = require '../models/channel-encryption'
+ServiceDevice      = require '../models/service-device'
+CredentialsDevice  = require '../models/credentials-device'
+UserDevice         = require '../models/user-device'
 
 class MailerService
-  constructor: ({@meshbluConfig}) ->
-    @channelEncryption = new ChannelEncryption @meshbluConfig
-    @serviceDevice     = new ServiceDevice @meshbluConfig
+  constructor: ({meshbluConfig, @serviceUrl}) ->
+    throw new Error('serviceUrl is required in order for things to actually work') unless @serviceUrl?
+    credentialsDeviceConfig = @_getCredentialsDeviceConfig {@serviceUrl}
 
-  onCreate: ({metadata, data}, callback) =>
+    @userDeviceConfig       = @_getUserDeviceConfig {@serviceUrl}
+    @channelEncryption      = new ChannelEncryption meshbluConfig
+    @serviceDevice          = new ServiceDevice {meshbluConfig, credentialsDeviceConfig}
+
+  onCreate: ({metadata}, callback) =>
     {auth} = metadata
-    {owner} = data
-
-    @createDevice {auth, owner}, callback
+    meshblu = new MeshbluHttp auth
+    meshblu.register @userDeviceConfig, callback
 
   onConfig: ({metadata, config}, callback) =>
     {options, encryptedOptions, lastEncrypted} = config
@@ -28,8 +31,9 @@ class MailerService
     if lastEncrypted? && (Date.now() - lastEncrypted) < 1000
       return callback @_userError("Verification request detected within 1 second of last request", 403)
 
-    userDevice = new UserDevice auth
+    userDevice = new UserDevice meshbluConfig: auth
     userDevice.setEncryptedOptions {options}, (error) =>
+      console.log {options, error}
       return callback error if error?
 
       @getVerificationMessage {auth, options}, (error, message) =>
@@ -46,7 +50,7 @@ class MailerService
     {auth, forwardedFor, fromUuid} = metadata
     originalDevice = _.last forwardedFor
 
-    credentialsDevice = new CredentialsDevice auth
+    credentialsDevice = new CredentialsDevice meshbluConfig: auth
     credentialsDevice.getClientSecret (error, clientSecret) =>
       return callback error if error?
       unless clientSecret?
@@ -61,16 +65,6 @@ class MailerService
 
       @processMessage options, callback
 
-  createDevice: ({auth, owner}, callback) =>
-    deviceData = @getUserDeviceData({auth, owner})
-
-    meshblu = new MeshbluHttp auth
-    meshblu.register deviceData, callback
-
-  getUserDeviceData: ({auth, owner}) =>
-    deviceData = _.cloneDeep defaultUserDevice
-    return deviceData
-
   getVerificationMessage: ({auth, options}, callback) =>
     meshblu = new MeshbluHttp auth
     meshblu.generateAndStoreToken auth.uuid, (error, response) =>
@@ -81,7 +75,7 @@ class MailerService
         to: options.auth.user
         from: options.auth.user
         subject: "Verify Email"
-        text: "http://device-mailer.octoblu.dev/device/verify?code=#{code}&timestamp=#{Date.now()}"
+        text: "#{@serviceUrl}/device/verify?code=#{code}"
 
       callback null, message
 
@@ -99,7 +93,7 @@ class MailerService
     {uuid, token, verified} = @channelEncryption.codeToAuth code
     return callback(@_userError 'Code could not be verified', 401) unless verified
 
-    userDevice = new UserDevice {uuid, token}
+    userDevice = new UserDevice meshbluConfig: {uuid, token}
 
     userDevice.getDecryptedOptions (error, options) =>
       return callback error if error?
@@ -123,5 +117,13 @@ class MailerService
 
   _getClientSecret: (options) =>
     options
+
+  _getUserDeviceConfig: (templateOptions)=>
+    deviceTemplate = fs.readFileSync './data/device-user-config.json', 'utf8'
+    return JSON.parse _.template(deviceTemplate)(templateOptions)
+
+  _getCredentialsDeviceConfig: (templateOptions)=>
+    deviceTemplate = fs.readFileSync './data/device-credentials-config.json', 'utf8'
+    return JSON.parse _.template(deviceTemplate)(templateOptions)
 
 module.exports = MailerService

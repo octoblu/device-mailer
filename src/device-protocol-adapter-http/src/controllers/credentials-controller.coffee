@@ -4,7 +4,7 @@ url = require 'url'
 _ = require 'lodash'
 
 class CredentialsController
-  constructor: ({@service}) ->
+  constructor: ({@service, @serviceUrl}) ->
 
   authenticate: (req, res) =>
     res.cookie('meshblu_auth_bearer', req.user.bearerToken)
@@ -25,9 +25,9 @@ class CredentialsController
         query:
           token: device.token
           protocol: req.meshbluAuth.protocol
-          server: req.meshbluAuth.host
+          hostname: req.meshbluAuth.host
           port: req.meshbluAuth.port
-          callbackURL: "http://device-mailer.octoblu.dev/device/configured"
+          callbackURL: "#{@serviceUrl}/device/configured"
 
       res.redirect editUrl
 
