@@ -39,3 +39,6 @@ local-mailer.json
 prod-mailer.json
 meshblu*.json
 tmp/
+
+# dev files
+.*-dev
