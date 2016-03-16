@@ -17,7 +17,7 @@ class ServiceDevice
     options = _.extend {clientID, owner: @uuid}, CredentialsDeviceData
     @meshbluHttp.register options, (error, {uuid, token}={}) =>
       return callback error if error?
-      callback error, new CredentialsDevice {uuid, token}
+      callback error, new CredentialsDevice meshbluConfig: {uuid, token}
 
   findOrCreateCredentialsDevice: ({clientID}, callback) =>
     @meshbluHttp.devices {clientID: clientID, owner: @uuid}, (error, result) =>
@@ -27,7 +27,7 @@ class ServiceDevice
       {uuid} = _.first result
       @meshbluHttp.generateAndStoreToken uuid, (error, {token}={}) =>
         return callback error if error?
-        return callback null, new CredentialsDevice {uuid, token}
+        return callback null, new CredentialsDevice meshbluConfig: {uuid, token}
 
   _userError: (message, code) =>
     error = new Error message

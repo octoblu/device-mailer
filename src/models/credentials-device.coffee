@@ -23,7 +23,7 @@ class CredentialsDevice
       callback null, clientSecret
 
   addUserDevice: ({uuid, token, owner}, callback) =>
-    userDevice = new UserDevice {uuid, token}
+    userDevice = new UserDevice meshbluConfig: {uuid, token}
     userDevice.linkToCredentialsAndOwner credentialsUuid: @uuid, owner: owner, (error) =>
       return callback error if error?
       @subscribeTo uuid: userDevice.uuid, callback

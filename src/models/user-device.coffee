@@ -8,6 +8,7 @@ ChannelEncryption = require '../models/channel-encryption'
 
 class UserDevice
   constructor: ({meshbluConfig}, dependencies={}) ->
+    throw new Error("Device must be constructed with credentials. Otherwise Bad Things will happen.") unless meshbluConfig?
     meshbluConfig      = new MeshbluConfig(meshbluConfig).toJSON()
 
     {@uuid, @token}    = meshbluConfig
