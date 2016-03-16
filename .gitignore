@@ -42,3 +42,4 @@ tmp/
 
 # dev files
 .*-dev
+*-dev
