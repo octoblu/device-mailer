@@ -1,0 +1,30 @@
+{
+  "uuid": "device-mailer-uuid",
+  "type": "device:mailer-service",
+  "name": "device-mailer-service",
+  "discoverWhitelist": [],
+  "configureWhitelist": [],
+  "receiveWhitelist": ["*"],
+  "sendWhitelist": ["*"],
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "required": true
+      },
+      "imageUrl": {
+        "type": "string",
+        "required": true
+      },
+      "callbackUrl": {
+        "type": "string",
+        "required": true
+      }
+    }
+  },
+  "options": {
+    "name": "Device-Mailer",
+    "callbackUrl": "${serviceUrl}/octoblu/authenticate"
+  }
+}

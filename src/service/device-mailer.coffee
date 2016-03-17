@@ -1,4 +1,3 @@
-fs                 = require 'fs'
 _                  = require 'lodash'
 nodemailer         = require 'nodemailer'
 MeshbluHttp        = require 'meshblu-http'
@@ -11,16 +10,15 @@ UserDevice         = require '../models/user-device'
 
 class MailerService
   constructor: ({meshbluConfig, @serviceUrl}) ->
-    credentialsDeviceConfig = @_getCredentialsDeviceConfig {@serviceUrl}
-
-    @userDeviceConfig       = @_getUserDeviceConfig {@serviceUrl}
     @channelEncryption      = new ChannelEncryption meshbluConfig
-    @serviceDevice          = new ServiceDevice {meshbluConfig, credentialsDeviceConfig}
+    @serviceDevice          = new ServiceDevice {meshbluConfig}
 
-  onCreate: ({metadata}, callback) =>
-    {auth} = metadata
-    meshblu = new MeshbluHttp auth
-    meshblu.register @userDeviceConfig, callback
+  run: (callback) =>
+    @serviceDevice.update (error) =>
+      callback new Error "Couldn't update the service device! Things are probably very bad. #{error.message}" if error?
+      callback()
+  onCreate: (options, callback) =>
+    @serviceDevice.createUserDevice callback
 
   onConfig: ({metadata, config}, callback) =>
     {options, encryptedOptions, lastEncrypted} = config
@@ -116,13 +114,5 @@ class MailerService
 
   _getClientSecret: (options) =>
     options
-
-  _getUserDeviceConfig: (templateOptions)=>
-    deviceTemplate = fs.readFileSync './data/device-user-config.json', 'utf8'
-    return JSON.parse _.template(deviceTemplate)(templateOptions)
-
-  _getCredentialsDeviceConfig: (templateOptions)=>
-    deviceTemplate = fs.readFileSync './data/device-credentials-config.json', 'utf8'
-    return JSON.parse _.template(deviceTemplate)(templateOptions)
 
 module.exports = MailerService

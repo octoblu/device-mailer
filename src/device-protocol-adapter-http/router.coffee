@@ -6,15 +6,18 @@ CredentialsController = require './src/controllers/credentials-controller'
 OctobluStrategy       = require 'passport-octoblu'
 
 class Router
-  constructor: ({service, @serviceUrl, @octobluOauthUrl, @oauthClientID, @oauthClientSecret, @meshbluConfig}, dependencies={}) ->
-    
+  constructor: ({service, @serviceUrl, @octobluOauthUrl, @meshbluConfig}, dependencies={}) ->
+    throw new Error "a service is required in order to make a channeldevice" unless service?
+    throw new Error "an octobluOauthUrl is required in order to make a channeldevice" unless @octobluOauthUrl?
+    throw new Error "a meshbluConfig is required in order to make a channeldevice" unless @meshbluConfig?
+
     @deviceController      = new DeviceController {service, @serviceUrl}
     @credentialsController = new CredentialsController {service, @serviceUrl}
 
   route: (app) =>
     app.use passport.initialize()
     app.use passport.session()
-    @setupOctobluOauth clientID: 'oauth-provider-uuid', clientSecret: 'some-random-token'
+    @setupOctobluOauth clientID: @meshbluConfig.uuid, clientSecret: @meshbluConfig.token
 
     app.get '/octoblu/authenticate', passport.authenticate('octoblu'), @credentialsController.authenticate
 

@@ -10,7 +10,6 @@ service = new MailerService(
 )
 
 adapter = new ProtocolAdapter {service}
-
 adapter.run()
 
 process.on 'SIGTERM', =>

@@ -13,9 +13,11 @@ class DeviceHttpProtocolAdapter
     process.exit 1
 
   run: =>
-    server = new Server @serverOptions
-    server.run (error) =>
-      return @panic error if error?
-      {address,port} = server.address()
+    @service.run (error)=>
+      throw error if error?
+      server = new Server @serverOptions
+      server.run (error) =>
+        return @panic error if error?
+        {address,port} = server.address()
 
 module.exports = DeviceHttpProtocolAdapter
