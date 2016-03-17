@@ -2,7 +2,7 @@
   "uuid": "device-mailer-uuid",
   "type": "device:mailer-service",
   "name": "device-mailer-service",
-  "discoverWhitelist": [],
+  "discoverWhitelist": ["*"],
   "configureWhitelist": [],
   "receiveWhitelist": ["*"],
   "sendWhitelist": ["*"],

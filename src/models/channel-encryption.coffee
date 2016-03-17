@@ -1,13 +1,16 @@
 NodeRSA           = require 'node-rsa'
 
 class ChannelEncryption
-  constructor: ({privateKey}) -> 
+  constructor: ({privateKey}) ->
     throw new Error('Private key not found!') unless privateKey?
     @key = @getPrivateKey privateKey
 
   getPrivateKey: (keyString) =>
     keyBinary = new Buffer(keyString, 'base64')
     return new NodeRSA keyBinary, 'pkcs1-der'
+
+  getPublicKey: () =>
+    @key.exportKey 'public'
 
   authToCode: ({uuid, token}) =>
     newAuth = "#{uuid}:#{token}"

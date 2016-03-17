@@ -11,14 +11,15 @@ UserDevice         = require '../models/user-device'
 class MailerService
   constructor: ({meshbluConfig, @serviceUrl}) ->
     @channelEncryption      = new ChannelEncryption meshbluConfig
-    @serviceDevice          = new ServiceDevice {meshbluConfig}
+    @serviceDevice          = new ServiceDevice {meshbluConfig, @serviceUrl}
 
   run: (callback) =>
     @serviceDevice.update (error) =>
       callback new Error "Couldn't update the service device! Things are probably very bad. #{error.message}" if error?
       callback()
+
   onCreate: (options, callback) =>
-    @serviceDevice.createUserDevice callback
+    @serviceDevice.createUserDevice options, callback
 
   onConfig: ({metadata, config}, callback) =>
     {options, encryptedOptions, lastEncrypted} = config
