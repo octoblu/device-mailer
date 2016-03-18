@@ -1,0 +1,31 @@
+{
+  "properties": {
+    "message": {
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "html": {
+          "type": "string",
+          "x-schema-form": {
+            "type": "textarea"
+          }
+        },
+        "text": {
+          "type": "string",
+          "x-schema-form": {
+            "type": "textarea"
+          }
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

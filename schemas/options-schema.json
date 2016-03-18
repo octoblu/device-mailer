@@ -1,0 +1,68 @@
+{
+  "properties": {
+    "service": {
+      "default": "",
+      "enum": [
+        "",
+        "1und1",
+        "AOL",
+        "DebugMail.io",
+        "DynectEmail",
+        "FastMail",
+        "GandiMail",
+        "Gmail",
+        "Godaddy",
+        "GodaddyAsia",
+        "GodaddyEurope",
+        "hot.ee",
+        "Hotmail",
+        "iCloud",
+        "mail.ee",
+        "Mail.ru",
+        "Mailgun",
+        "Mailjet",
+        "Mandrill",
+        "Naver",
+        "Postmark",
+        "QQ",
+        "QQex",
+        "SendCloud",
+        "SendGrid",
+        "SES",
+        "Sparkpost",
+        "Yahoo",
+        "Yandex",
+        "Zoho"
+      ],
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "port": {
+      "type": "integer"
+    },
+    "secure": {
+      "default": null,
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "string",
+          "x-schema-form": {
+            "type": "password"
+          }
+        }
+      }
+    }
+  },
+  "type": "object"
+}

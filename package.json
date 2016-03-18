@@ -18,7 +18,7 @@
     "express-meshblu-healthcheck": "^1.0.1",
     "meshblu-config": "^4.0.0",
     "morgan": "^1.6.1",
-    "node-rsa": "^0.2.23",
+    "node-rsa": "^0.3.2",
     "nodemailer": "^2.1.0",
     "nodemailer-mandrill-transport": "^1.0.0",
     "nodemailer-sailthru-transport": "^0.2.2",
