@@ -43,3 +43,4 @@ tmp/
 # dev files
 .*-dev
 *-dev
+tmp.coffee
