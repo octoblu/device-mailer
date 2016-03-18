@@ -1,18 +1,23 @@
-dashdash = require 'dashdash'
-MailerService = require '.'
+_             = require 'lodash'
+dashdash      = require 'dashdash'
 MeshbluConfig = require 'meshblu-config'
-
-ProtocolAdapter = require './src/device-protocol-adapter-http'
+MailerService = require '.'
+Server        = require './src/server'
 
 service = new MailerService(
   meshbluConfig: new MeshbluConfig().toJSON()
   serviceUrl: process.env.SERVICE_URL
 )
 
-adapter = new ProtocolAdapter {service}
-adapter.run()
+service.run (error)=>
+  throw error if error?
+  server = new Server {port: process.env.PORT || 80, service}
+  server.run (error) =>
+    return @panic error if error?
+    {address,port} = server.address()    
+
 
 process.on 'SIGTERM', =>
   console.log 'SIGTERM caught, exiting'
-  adapter.stop =>
+  server.stop =>
     process.exit 0

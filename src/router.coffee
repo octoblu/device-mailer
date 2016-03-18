@@ -1,8 +1,8 @@
 url                   = require 'url'
 passport              = require 'passport'
 MeshbluAuth           = require 'express-meshblu-auth'
-DeviceController      = require './src/controllers/device-controller'
-CredentialsController = require './src/controllers/credentials-controller'
+DeviceController      = require './controllers/device-controller'
+CredentialsController = require './controllers/credentials-controller'
 OctobluStrategy       = require 'passport-octoblu'
 
 class Router
