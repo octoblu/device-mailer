@@ -26,12 +26,13 @@ class MailerService
     {auth} = metadata
     return callback() unless options?
 
+    console.log "onConfig: UserDevice:", auth
     if lastEncrypted? && (Date.now() - lastEncrypted) < 1000
       return callback @_userError("Verification request detected within 1 second of last request", 403)
 
     userDevice = new UserDevice meshbluConfig: auth
+
     userDevice.setEncryptedOptions {options}, (error) =>
-      console.log {options, error}
       return callback error if error?
 
       @getVerificationMessage {auth, options}, (error, message) =>
@@ -84,6 +85,7 @@ class MailerService
     if transporter
       transportOptions = require("nodemailer-#{transporter}-transport")(transportOptions)
 
+    console.log "Processing message:", {originalDevice, auth, options, message, fromUuid}
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
       meshblu.message {devices: [fromUuid], result: {error: err?.message,info}}, as: originalDevice, callback
 
