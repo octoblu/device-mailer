@@ -1,4 +1,5 @@
-NodeRSA           = require 'node-rsa'
+NodeRSA = require 'node-rsa'
+_       = require 'lodash'
 
 class ChannelEncryption
   constructor: ({privateKey}) ->
