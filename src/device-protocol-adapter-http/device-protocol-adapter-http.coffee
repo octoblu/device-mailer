@@ -12,7 +12,7 @@ class DeviceHttpProtocolAdapter
     console.error error.stack
     process.exit 1
 
-  run: (callback) =>
+  run: (callback=->) =>
     @service.run (error)=>
       throw error if error?
       server = new Server @serverOptions
@@ -21,7 +21,7 @@ class DeviceHttpProtocolAdapter
         {address,port} = server.address()
         callback()
 
-  stop: (callback) =>
+  stop: (callback=->) =>
     callback()
-    
+
 module.exports = DeviceHttpProtocolAdapter

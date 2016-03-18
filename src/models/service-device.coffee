@@ -32,7 +32,7 @@ class ServiceDevice
 
   createUserDevice: ( options, callback) =>
     deviceOptions = _.extend {}, options, @userDeviceConfig
-    @meshblu.register @userDeviceConfig, (error, device) =>
+    @meshblu.register @userDeviceConfig, callback
 
   findOrCreateCredentialsDevice: ({clientID}, callback) =>
     @meshblu.devices {clientID: clientID, owner: @uuid}, (error, result) =>
