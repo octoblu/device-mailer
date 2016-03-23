@@ -4,7 +4,7 @@ _           = require 'lodash'
 class DeviceController
   constructor: ({@service}) ->
 
-  getDeviceConfig: (req, callback) =>    
+  getDeviceConfig: (req, callback) =>
     meshblu = new MeshbluHttp req.meshbluAuth
     meshblu.whoami (error, device) =>
       return callback error if error?
