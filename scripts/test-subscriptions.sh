@@ -1,5 +1,5 @@
 #!/bin/sh
-RECEIVED_MESSAGE_URL="http://requestb.in/1dl9rod1"
+RECEIVED_MESSAGE_URL="http://requestb.in/phxbdcph"
 MESSENGER_DEVICE_UUID=$(meshblu-util register -s meshblu.octoblu.dev:80 -o | tee messenger-device.json | jq -r '.uuid')
 RECEIVER_DEVICE_UUID=$(meshblu-util register -s meshblu.octoblu.dev:80 -d "{\
  \"receiveWhitelist\": []\
