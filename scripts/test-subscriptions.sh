@@ -1,7 +1,8 @@
 #!/bin/sh
+SERVER="meshblu.octoblu.com:443"
 RECEIVED_MESSAGE_URL="http://requestb.in/phxbdcph"
-MESSENGER_DEVICE_UUID=$(meshblu-util register -s meshblu.octoblu.dev:80 -o | tee messenger-device.json | jq -r '.uuid')
-RECEIVER_DEVICE_UUID=$(meshblu-util register -s meshblu.octoblu.dev:80 -d "{\
+MESSENGER_DEVICE_UUID=$(meshblu-util register -s $SERVER -o | tee messenger-device.json | jq -r '.uuid')
+RECEIVER_DEVICE_UUID=$(meshblu-util register -s $SERVER -d "{\
  \"receiveWhitelist\": []\
 , \"sendWhitelist\": [\"*\"]\
 , \"discoverWhitelist\": [\"*\"]\
@@ -10,7 +11,7 @@ RECEIVER_DEVICE_UUID=$(meshblu-util register -s meshblu.octoblu.dev:80 -d "{\
 , \"sendAsWhitelist\": []\
 }" | tee receiver-device.json | jq -r '.uuid')
 
-SUBSCRIBER_DEVICE_UUID=$(meshblu-util register -s meshblu.octoblu.dev:80  -d "{\
+SUBSCRIBER_DEVICE_UUID=$(meshblu-util register -s $SERVER  -d "{\
  \"receiveWhitelist\": []\
 , \"sendWhitelist\": []\
 , \"configureWhitelist\": []\
