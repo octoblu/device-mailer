@@ -15,7 +15,7 @@ class MailerService
 
   run: (callback) =>
     @serviceDevice.update (error) =>
-      callback new Error "Couldn't update the service device! Things are probably very bad. #{error.message}" if error?
+      return callback new Error "Couldn't update the service device! Things are probably very bad. #{error.message}" if error?
       callback()
 
   onCreate: (options, callback) =>
