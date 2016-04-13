@@ -5,6 +5,7 @@ bodyParser         = require 'body-parser'
 errorHandler       = require 'errorhandler'
 cookieParser       = require 'cookie-parser'
 meshbluHealthcheck = require 'express-meshblu-healthcheck'
+expressVersion     = require 'express-package-version'
 MeshbluConfig      = require 'meshblu-config'
 Router             = require './router'
 
@@ -21,6 +22,7 @@ class Server
   run: (callback) =>
     app = express()
     app.use meshbluHealthcheck()
+    app.use expressVersion()
     app.use morgan 'dev', immediate: false unless @disableLogging
     app.use cors()
     app.use errorHandler()
