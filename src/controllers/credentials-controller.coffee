@@ -22,10 +22,11 @@ class CredentialsController
 
       editUrl = url.format
         host: "#{@deviceEditorUrl}/#{device.uuid}"
+        protocol: req.headers['x-forwarded-proto'] || req.protocol
         query:
           token: device.token
           protocol: req.meshbluAuth.protocol
-          hostname: req.meshbluAuth.host
+          hostname: req.meshbluAuth.hostname
           port: req.meshbluAuth.port
           callbackURL: "#{@serviceUrl}/device/configured"
 
