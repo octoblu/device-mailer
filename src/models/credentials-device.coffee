@@ -29,10 +29,20 @@ class CredentialsDevice
       @subscribeTo uuid: userDevice.uuid, callback
 
   subscribeTo: ({uuid}, callback) =>
+    @subscribeToMe (error) =>
+      return callback error if error?
+
+      @meshbluHttp.createSubscription {
+        subscriberUuid: @uuid
+        emitterUuid: uuid
+        type:'message.received'
+      }, callback
+
+  subscribeToMe: (callback) =>
     @meshbluHttp.createSubscription {
       subscriberUuid: @uuid
-      emitterUuid:uuid
-      type:'received'
+      emitterUuid: @uuid
+      type:'message.received'
     }, callback
 
   getUserDevices: (callback) =>

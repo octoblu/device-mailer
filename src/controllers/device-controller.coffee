@@ -16,7 +16,7 @@ class DeviceController
     envelope =
       metadata:
         auth: req.meshbluAuth
-        forwardedFor: req.body.forwardedFor
+        route: JSON.parse req.get('x-meshblu-route')
         fromUuid: req.body.fromUuid
       message: message.message
 

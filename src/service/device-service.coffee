@@ -46,8 +46,8 @@ class MailerService
         @processMessage options, callback
 
   onReceived: ({metadata, message}, callback) =>
-    {auth, forwardedFor, fromUuid} = metadata
-    originalDevice = _.last forwardedFor
+    {auth, route, fromUuid} = metadata
+    originalDevice = _.first route
 
     credentialsDevice = new CredentialsDevice meshbluConfig: auth
     credentialsDevice.getClientSecret (error, clientSecret) =>
@@ -87,6 +87,7 @@ class MailerService
 
     console.log "Processing message:", {originalDevice, auth, options, message, fromUuid}
     nodemailer.createTransport(transportOptions).sendMail message, (err, info) =>
+      console.log 'err,info', JSON.stringify {err, info}
       meshblu.message {devices: [fromUuid], result: {error: err?.message,info}}, as: originalDevice, callback
 
   linkToCredentialsDevice: ({code, owner}, callback) =>
